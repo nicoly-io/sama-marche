@@ -1,4 +1,7 @@
-
+// Fallback pour API_URL (si non défini dans app.js)
+if (typeof API_URL === 'undefined') {
+    var API_URL = 'https://sama-marche.onrender.com/api';
+}
 
 // Récupérer l'ID depuis l'URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -13,7 +16,7 @@ let currentListing = null;
 let currentUserId = null;
 
 // Récupérer le token et l'utilisateur
-const authToken = localStorage.getItem('token'); // Renommé pour éviter conflit
+const authToken = localStorage.getItem('token');
 try {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
