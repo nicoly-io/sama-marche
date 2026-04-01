@@ -1,7 +1,4 @@
-// Fallback pour API_URL (si non défini dans app.js)
-if (typeof API_URL === 'undefined') {
-    var API_URL = 'https://sama-marche.onrender.com/api';
-}
+// API_URL est déjà définie dans app.js, ne pas la redéclarer
 
 // Récupérer l'ID depuis l'URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -15,8 +12,8 @@ if (!listingId) {
 let currentListing = null;
 let currentUserId = null;
 
-// Récupérer le token et l'utilisateur
-const authToken = localStorage.getItem('token');
+// Récupérer le token et l'utilisateur (Modification ici : localAuthToken au lieu de authToken)
+const localAuthToken = localStorage.getItem('token');
 try {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -25,7 +22,7 @@ try {
     }
 } catch(e) {}
 
-console.log('authToken présent:', !!authToken);
+console.log('authToken présent:', !!localAuthToken);
 console.log('currentUserId:', currentUserId);
 
 // Attendre que le DOM soit prêt
@@ -135,8 +132,8 @@ function setupButtons() {
             buyBtn.style.display = 'block';
             buyBtn.onclick = function(e) {
                 e.preventDefault();
-                console.log('Clic sur Acheter - authToken:', !!authToken);
-                if (!authToken) {
+                console.log('Clic sur Acheter - authToken:', !!localAuthToken);
+                if (!localAuthToken) {
                     window.location.href = `login.html?redirect=checkout.html?id=${listingId}`;
                 } else {
                     window.location.href = `checkout.html?id=${listingId}`;
@@ -158,8 +155,8 @@ function setupButtons() {
             contactBtn.style.display = 'block';
             contactBtn.onclick = function(e) {
                 e.preventDefault();
-                console.log('Clic sur Contacter - authToken:', !!authToken);
-                if (!authToken) {
+                console.log('Clic sur Contacter - authToken:', !!localAuthToken);
+                if (!localAuthToken) {
                     window.location.href = `login.html?redirect=listing-detail.html?id=${listingId}`;
                 } else {
                     window.location.href = `chat.html?listing=${listingId}`;
@@ -238,12 +235,12 @@ function setupAuthButtons() {
     const logoutBtn = document.getElementById('logoutBtn');
     const loginBtn = document.getElementById('loginBtn');
     
-    if (authToken) {
+    if (localAuthToken) {
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
         if (loginBtn) loginBtn.style.display = 'none';
         
         fetch(`${API_URL}/users/profile`, {
-            headers: { 'Authorization': 'Bearer ' + authToken }
+            headers: { 'Authorization': 'Bearer ' + localAuthToken }
         })
         .then(r => r.json())
         .then(data => {
