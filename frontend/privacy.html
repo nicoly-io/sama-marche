@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politique de confidentialité - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: #f5f7fb;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .legal-card {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        body.dark-mode .legal-card {
+            background: #1F2937;
+        }
+        
+        .legal-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+        }
+        
+        .legal-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .legal-header p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .legal-body {
+            padding: 2rem;
+        }
+        
+        .legal-body h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0D9488;
+            margin: 1.5rem 0 0.75rem 0;
+        }
+        
+        .legal-body h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin: 1rem 0 0.5rem 0;
+        }
+        
+        body.dark-mode .legal-body h3 {
+            color: #F9FAFB;
+        }
+        
+        .legal-body p {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #4B5563;
+            margin-bottom: 1rem;
+        }
+        
+        body.dark-mode .legal-body p {
+            color: #9CA3AF;
+        }
+        
+        .legal-body ul {
+            margin: 0.5rem 0 1rem 1.5rem;
+        }
+        
+        .legal-body li {
+            font-size: 0.875rem;
+            color: #4B5563;
+            margin-bottom: 0.5rem;
+        }
+        
+        body.dark-mode .legal-body li {
+            color: #9CA3AF;
+        }
+        
+        .legal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #E5E7EB;
+            text-align: center;
+        }
+        
+        body.dark-mode .legal-footer {
+            border-color: #374151;
+        }
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .btn-back:hover {
+            transform: translateY(-2px);
+        }
+        
+        .date {
+            font-size: 0.75rem;
+            color: #9CA3AF;
+            margin-top: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="flex items-center gap-2" id="authButtons"></div>
+                <button id="themeToggle" class="theme-toggle" title="Mode sombre/clair">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="legal-card">
+            <div class="legal-header">
+                <h1>Politique de Confidentialité</h1>
+                <p>Dernière mise à jour : 1er avril 2026</p>
+            </div>
+            <div class="legal-body">
+                <h2>1. Introduction</h2>
+                <p>Sama-Marche attache une grande importance à la protection de vos données personnelles. Cette politique vous informe sur la manière dont nous collectons, utilisons et protégeons vos informations.</p>
+                
+                <h2>2. Données collectées</h2>
+                <p>Nous collectons les informations suivantes :</p>
+                <ul>
+                    <li><strong>Données d'identification</strong> : nom, prénom, email, numéro de téléphone</li>
+                    <li><strong>Données de vérification</strong> : CNI (recto/verso) uniquement pour la vérification d'identité</li>
+                    <li><strong>Données de transaction</strong> : historique des achats et ventes</li>
+                    <li><strong>Données de localisation</strong> : quartier et ville pour les annonces</li>
+                    <li><strong>Données de connexion</strong> : adresse IP, navigateur, horodatage</li>
+                </ul>
+                
+                <h2>3. Utilisation des données</h2>
+                <p>Vos données sont utilisées pour :</p>
+                <ul>
+                    <li>Créer et gérer votre compte utilisateur</li>
+                    <li>Faciliter les transactions entre acheteurs et vendeurs</li>
+                    <li>Assurer la sécurité et la confiance sur la plateforme</li>
+                    <li>Vous informer sur vos transactions et messages</li>
+                    <li>Améliorer nos services et l'expérience utilisateur</li>
+                </ul>
+                
+                <h2>4. Protection des CNI</h2>
+                <p>Les photos de CNI sont chiffrées avant stockage et ne sont accessibles qu'à notre équipe de modération. Elles ne sont jamais partagées avec d'autres utilisateurs.</p>
+                
+                <h2>5. Partage des données</h2>
+                <p>Sama-Marche ne vend ni ne loue vos données personnelles à des tiers. Les informations sont partagées uniquement dans les cas suivants :</p>
+                <ul>
+                    <li>Avec PayTech pour le traitement des paiements</li>
+                    <li>Avec les autorités judiciaires si requis par la loi</li>
+                    <li>Entre acheteurs et vendeurs pour faciliter la transaction (nom, téléphone uniquement après achat)</li>
+                </ul>
+                
+                <h2>6. Conservation des données</h2>
+                <p>Vos données sont conservées tant que votre compte est actif. En cas de suppression de compte, vos données sont anonymisées dans un délai de 30 jours, sauf obligation légale de conservation.</p>
+                
+                <h2>7. Sécurité</h2>
+                <p>Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles pour protéger vos données : chiffrement, accès restreint, logs de sécurité.</p>
+                
+                <h2>8. Vos droits</h2>
+                <p>Conformément à la législation, vous disposez des droits suivants :</p>
+                <ul>
+                    <li>Droit d'accès à vos données</li>
+                    <li>Droit de rectification</li>
+                    <li>Droit à l'effacement (suppression de compte)</li>
+                    <li>Droit d'opposition au traitement</li>
+                </ul>
+                <p>Pour exercer ces droits, contactez-nous à : <strong>support@sama-marche.sn</strong></p>
+                
+                <h2>9. Cookies</h2>
+                <p>Nous utilisons des cookies pour maintenir votre session de connexion et améliorer votre expérience. Vous pouvez les désactiver dans votre navigateur, mais certaines fonctionnalités pourraient ne plus fonctionner.</p>
+                
+                <h2>10. Contact</h2>
+                <p>Pour toute question relative à la protection de vos données, vous pouvez nous contacter :</p>
+                <ul>
+                    <li>Email : <strong>support@sama-marche.sn</strong></li>
+                    <li>Téléphone : <strong>76 797 99 87</strong></li>
+                </ul>
+            </div>
+            <div class="legal-footer">
+                <a href="register.html" class="btn-back"><i class="fas fa-arrow-left"></i> Retour à l'inscription</a>
+                <div class="date">© 2026 Sama-Marche. Tous droits réservés.</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Gestion du thème
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+        
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            });
+        }
+        
+        // Affichage des boutons selon connexion
+        const token = localStorage.getItem('token');
+        const authButtons = document.getElementById('authButtons');
+        
+        if (authButtons) {
+            if (token) {
+                authButtons.innerHTML = `
+                    <a href="dashboard.html" class="btn-nav btn-nav-primary">
+                        <i class="fas fa-user-circle"></i> Mon compte
+                    </a>
+                    <a href="chat.html" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-comment-dots"></i> Messages
+                    </a>
+                    <button id="logoutHeaderBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                `;
+                
+                document.getElementById('logoutHeaderBtn')?.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'index.html';
+                });
+            } else {
+                authButtons.innerHTML = `
+                    <a href="login.html" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-in-alt"></i> Connexion
+                    </a>
+                    <a href="register.html" class="btn-nav btn-nav-primary">
+                        <i class="fas fa-user-plus"></i> Inscription
+                    </a>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

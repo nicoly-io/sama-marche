@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Styles pour le header amélioré */
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-nav i {
+            font-size: 1rem;
+        }
+        
+        .btn-nav-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .btn-nav-outline:hover {
+            background: var(--gray-100);
+            transform: translateY(-2px);
+        }
+        
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
+        }
+        
+        .btn-nav-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-nav-icon {
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .btn-nav-icon:hover {
+            background: var(--gray-100);
+            transform: scale(1.05);
+        }
+        
+        .btn-relative {
+            position: relative;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            display: none;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray-600);
+            transition: all 0.2s ease;
+        }
+        
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .admin-tab {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Style pour le bouton thème */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--gray-200);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-buttons {
+                gap: 0.5rem;
+            }
+            
+            .btn-nav {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="header-buttons">
+                    <a href="chat.html" class="btn-nav btn-nav-outline btn-relative">
+                        <i class="fas fa-comment-dots"></i> Messages
+                        <span id="unreadBadge" class="unread-badge">0</span>
+                    </a>
+                    <span id="adminName" style="font-size: 0.875rem;"></span>
+                    <button id="logoutBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                    <button id="themeToggle" class="btn-nav-icon" title="Mode sombre/clair">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0;">
+        <!-- Statistiques -->
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 id="totalUsers" style="font-size: 2rem; color: var(--primary);">0</h3>
+                    <p><i class="fas fa-users"></i> Utilisateurs</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 id="verifiedUsers" style="font-size: 2rem; color: var(--success);">0</h3>
+                    <p><i class="fas fa-check-circle"></i> Vérifiés</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 id="totalListings" style="font-size: 2rem; color: var(--primary);">0</h3>
+                    <p><i class="fas fa-box"></i> Annonces</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 id="activeListings" style="font-size: 2rem; color: var(--success);">0</h3>
+                    <p><i class="fas fa-check"></i> Annonces actives</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 id="totalEscrow" style="font-size: 2rem; color: var(--warning);">0</h3>
+                    <p><i class="fas fa-lock"></i> FCFA en séquestre</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 id="totalFees" style="font-size: 2rem; color: var(--secondary);">0</h3>
+                    <p><i class="fas fa-chart-line"></i> FCFA de commissions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Admin -->
+        <div class="flex" style="gap: 0.5rem; border-bottom: 1px solid var(--gray-200); margin-bottom: 1.5rem;">
+            <button class="tab-btn active" data-tab="cni"><i class="fas fa-id-card"></i> CNI à valider</button>
+            <button class="tab-btn" data-tab="disputes"><i class="fas fa-gavel"></i> Litiges</button>
+            <button class="tab-btn" data-tab="listings"><i class="fas fa-flag"></i> Annonces signalées</button>
+            <button class="tab-btn" data-tab="users"><i class="fas fa-users"></i> Utilisateurs</button>
+        </div>
+
+        <!-- Contenu des tabs -->
+        <div id="cniTab" class="admin-tab active">
+            <h3><i class="fas fa-id-card"></i> Demandes de vérification CNI</h3>
+            <div id="pendingCNI" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div id="disputesTab" class="admin-tab" style="display: none;">
+            <h3><i class="fas fa-gavel"></i> Litiges en attente</h3>
+            <div id="pendingDisputes" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div id="listingsTab" class="admin-tab" style="display: none;">
+            <h3><i class="fas fa-flag"></i> Annonces à modérer</h3>
+            <div id="flaggedListings" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div id="usersTab" class="admin-tab" style="display: none;">
+            <h3><i class="fas fa-users"></i> Utilisateurs</h3>
+            <div id="usersList" style="margin-top: 1rem;"></div>
+        </div>
+    </main>
+
+    <!-- Modal pour voir la CNI -->
+    <div id="cniModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-id-card"></i> CNI à vérifier</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="flex" style="gap: 1rem; flex-wrap: wrap;">
+                    <div>
+                        <p><strong><i class="fas fa-camera"></i> Recto</strong></p>
+                        <img id="cniRectoImg" src="" style="max-width: 100%; border-radius: 8px;">
+                    </div>
+                    <div>
+                        <p><strong><i class="fas fa-camera"></i> Verso</strong></p>
+                        <img id="cniVersoImg" src="" style="max-width: 100%; border-radius: 8px;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label"><i class="fas fa-comment"></i> Motif de rejet (optionnel)</label>
+                    <textarea id="rejectionReason" class="form-textarea" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="rejectCniBtn" class="btn btn-danger"><i class="fas fa-times"></i> Rejeter</button>
+                <button id="approveCniBtn" class="btn btn-primary"><i class="fas fa-check"></i> Valider</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/admin.js"></script>
+    <script>
+        // Charger le nombre de messages non lus
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:5000/api/chat/conversations', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.conversations) {
+                    const totalUnread = data.conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+                    const badge = document.getElementById('unreadBadge');
+                    if (badge && totalUnread > 0) {
+                        badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                        badge.style.display = 'inline-block';
+                    }
+                }
+            })
+            .catch(console.error);
+        }
+    </script>
+</body>
+</html>

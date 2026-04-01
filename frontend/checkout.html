@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement sécurisé - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: #f5f7fb;
+        }
+        .payment-summary {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 1rem;
+        }
+        body.dark-mode .payment-summary {
+            background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+        }
+        .payment-icon {
+            font-size: 3rem;
+            color: #0D9488;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="btn btn-outline btn-sm"><i class="fas fa-home"></i> Accueil</a>
+                    <a href="chat.html" class="btn btn-outline btn-sm">
+                        <i class="fas fa-comment-dots"></i> Messages
+                    </a>
+                    <span id="userName" style="font-size: 0.875rem;"></span>
+                    <button id="logoutBtn" class="btn btn-outline btn-sm"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0; max-width: 500px; margin: 0 auto;">
+        <div class="card">
+            <div class="card-header" style="text-align: center;">
+                <div class="payment-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Paiement sécurisé</h3>
+                <p class="text-sm text-gray-500">Votre argent est bloqué jusqu'à validation de la livraison</p>
+            </div>
+            <div class="card-body">
+                <div class="payment-summary" style="margin-bottom: 1.5rem;">
+                    <div class="flex justify-between" style="margin-bottom: 0.5rem;">
+                        <span><i class="fas fa-tag"></i> Article:</span>
+                        <strong id="itemTitle">Chargement...</strong>
+                    </div>
+                    <div class="flex justify-between" style="margin-bottom: 0.5rem;">
+                        <span><i class="fas fa-money-bill-wave"></i> Prix vendeur:</span>
+                        <span id="sellerPrice">0 FCFA</span>
+                    </div>
+                    <div class="flex justify-between" style="margin-bottom: 0.5rem; color: var(--gray-600);">
+                        <span><i class="fas fa-percent"></i> Frais de service (6%):</span>
+                        <span id="fees">0 FCFA</span>
+                    </div>
+                    <div class="flex justify-between" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--gray-300); font-weight: bold;">
+                        <span><i class="fas fa-calculator"></i> Total à payer:</span>
+                        <span id="totalPrice" class="text-primary" style="font-size: 1.25rem; font-weight: 800;">0 FCFA</span>
+                    </div>
+                </div>
+
+                <div class="payment-methods-info" style="margin-bottom: 1.5rem; text-align: center;">
+                    <p class="text-sm text-gray-500">
+                        <i class="fas fa-credit-card"></i> Paiement par Orange Money, Wave, ou carte bancaire
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        Vous serez redirigé vers la plateforme sécurisée PayTech
+                    </p>
+                </div>
+
+                <div id="errorMsg" class="form-error" style="display: none; margin-bottom: 1rem;"></div>
+
+                <button id="payBtn" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1rem; border-radius: 50px;" disabled>
+                    <i class="fas fa-credit-card"></i> Payer maintenant
+                </button>
+
+                <div class="text-center" style="margin-top: 1rem;">
+                    <p class="text-xs text-gray-500">
+                        <i class="fas fa-shield-alt"></i> Paiement sécurisé par PayTech<br>
+                        L'argent reste bloqué jusqu'à ce que vous confirmiez la livraison
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/checkout.js"></script>
+</body>
+</html>

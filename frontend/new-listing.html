@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Déposer une annonce - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Styles pour le header amélioré */
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-nav i {
+            font-size: 1rem;
+        }
+        
+        .btn-nav-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .btn-nav-outline:hover {
+            background: var(--gray-100);
+            transform: translateY(-2px);
+        }
+        
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
+        }
+        
+        .btn-nav-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-nav-icon {
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .btn-nav-icon:hover {
+            background: var(--gray-100);
+            transform: scale(1.05);
+        }
+        
+        .btn-relative {
+            position: relative;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            display: none;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        /* Styles spécifiques au formulaire */
+        body {
+            background: #f5f7fb;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body.dark-mode {
+            background: #111827;
+        }
+        
+        /* Sections du formulaire */
+        .form-section {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        body.dark-mode .form-section {
+            background: #1F2937;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        body.dark-mode .section-title {
+            border-bottom-color: #374151;
+        }
+        
+        .section-title i {
+            color: #0D9488;
+            font-size: 1.1rem;
+        }
+        
+        /* Groupe localisation avec bouton */
+        .location-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        
+        .location-group .input-with-icon {
+            flex: 1;
+        }
+        
+        .btn-location {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+            border: none;
+            padding: 0.875rem 1rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .btn-location:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-location:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .location-status {
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .location-status i {
+            font-size: 0.7rem;
+        }
+        
+        .location-status.success {
+            color: #10B981;
+        }
+        
+        .location-status.error {
+            color: #EF4444;
+        }
+        
+        /* Chips pour l'état */
+        .condition-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .chip {
+            padding: 0.625rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+        }
+        
+        body.dark-mode .chip {
+            background: #374151;
+            color: #d1d5db;
+            border-color: #4b5563;
+        }
+        
+        .chip:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+        
+        .chip.active {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* Zone de drop photos */
+        .photo-dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fafbfc;
+        }
+        
+        body.dark-mode .photo-dropzone {
+            border-color: #4b5563;
+            background: #1f2937;
+        }
+        
+        .photo-dropzone:hover {
+            border-color: #0D9488;
+            background: #f0fdf4;
+        }
+        
+        body.dark-mode .photo-dropzone:hover {
+            background: #0D9488;
+            border-color: #0D9488;
+        }
+        
+        .photo-dropzone.drag-over {
+            border-color: #0D9488;
+            background: #e6f7f5;
+        }
+        
+        .photo-dropzone i {
+            font-size: 3rem;
+            color: #0D9488;
+            margin-bottom: 1rem;
+        }
+        
+        .photo-dropzone p {
+            margin: 0.5rem 0;
+            color: #6b7280;
+        }
+        
+        .photo-dropzone small {
+            color: #9ca3af;
+        }
+        
+        /* Aperçu des photos */
+        .photo-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .photo-preview-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            background: #f3f4f6;
+        }
+        
+        .photo-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-preview-item .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .photo-preview-item .remove-photo:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+        
+        /* Champs avec icônes */
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 1rem;
+        }
+        
+        .input-with-icon input,
+        .input-with-icon textarea,
+        .input-with-icon select {
+            padding-left: 2.5rem;
+        }
+        
+        /* Effet de focus */
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            border-color: #0D9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+            outline: none;
+        }
+        
+        /* Aide contextuelle */
+        .input-help {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+        }
+        
+        /* Bouton thème */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--gray-200);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .form-section {
+                padding: 1rem;
+            }
+            
+            .condition-chips {
+                gap: 0.5rem;
+            }
+            
+            .chip {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+            
+            .header-buttons {
+                gap: 0.5rem;
+            }
+            
+            .btn-nav {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .location-group {
+                flex-direction: column;
+            }
+            
+            .btn-location {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="header-buttons">
+                    <a href="index.html" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-home"></i> Accueil
+                    </a>
+                    <a href="chat.html" class="btn-nav btn-nav-outline btn-relative">
+                        <i class="fas fa-comment-dots"></i> Messages
+                        <span id="unreadBadge" class="unread-badge">0</span>
+                    </a>
+                    <span id="userName" style="font-size: 0.875rem;"></span>
+                    <button id="logoutBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                    <button id="themeToggle" class="btn-nav-icon" title="Mode sombre/clair">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0; max-width: 700px;">
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 700;">
+            <i class="fas fa-plus-circle" style="color: #0D9488;"></i> Déposer une annonce
+        </h2>
+        
+        <form id="listingForm" enctype="multipart/form-data">
+            <!-- Section 1 : Informations de base -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Informations de base</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-tag"></i> Titre *</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-heading"></i>
+                        <input type="text" id="title" class="form-input" placeholder="Ex: iPhone 13 Pro - Très bon état" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-layer-group"></i> Catégorie</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-folder"></i>
+                        <select id="category" class="form-select">
+                            <option value="phones">📱 Téléphones</option>
+                            <option value="electronics">💻 Électronique</option>
+                            <option value="fashion">👕 Mode</option>
+                            <option value="vehicles">🚗 Véhicules</option>
+                            <option value="real-estate">🏠 Immobilier</option>
+                            <option value="other">📦 Autre</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-money-bill-wave"></i> Prix (FCFA) *</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-coins"></i>
+                        <input type="number" id="sellerPrice" class="form-input" placeholder="Ex: 200000" required>
+                    </div>
+                    <div class="input-help">
+                        <i class="fas fa-info-circle"></i> Le prix affiché inclura 6% de frais de service (séquestre + plateforme)
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 2 : Détails & Photos -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-image"></i>
+                    <span>Photos & Description</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-pen" style="top: 16px; transform: none;"></i>
+                        <textarea id="description" class="form-textarea" rows="4" placeholder="Décrivez votre article en détail..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-clipboard-list"></i> État *</label>
+                    <div class="condition-chips" id="conditionChips">
+                        <span class="chip" data-condition="new">✨ Neuf</span>
+                        <span class="chip" data-condition="like_new">🌟 Très bon état</span>
+                        <span class="chip" data-condition="good">👍 Bon état</span>
+                        <span class="chip" data-condition="fair">🔄 Correct</span>
+                    </div>
+                    <input type="hidden" id="condition" value="good">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-camera"></i> Photos (max 5)</label>
+                    <div class="photo-dropzone" id="photoDropzone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Cliquez ou glissez vos photos ici</strong></p>
+                        <small>PNG, JPG jusqu'à 5 Mo chacun • Compression automatique</small>
+                    </div>
+                    <input type="file" id="photos" accept="image/*" multiple style="display: none;">
+                    <div id="previewPhotos" class="photo-preview-grid"></div>
+                    <div class="input-help" id="photoHelp">
+                        <i class="fas fa-info-circle"></i> Jusqu'à 5 photos. La première sera la photo principale.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 3 : Localisation avec géolocalisation -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Localisation</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-city"></i> Quartier *</label>
+                    <div class="location-group">
+                        <div class="input-with-icon">
+                            <i class="fas fa-location-dot"></i>
+                            <input type="text" id="quartier" class="form-input" placeholder="Ex: Médina, Pikine, Saly..." required>
+                        </div>
+                        <button type="button" id="getLocationBtn" class="btn-location">
+                            <i class="fas fa-map-pin"></i> Ma position
+                        </button>
+                    </div>
+                    <div id="locationStatus" class="location-status" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Récupération de votre position...
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-building"></i> Ville</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-map-pin"></i>
+                        <input type="text" id="ville" class="form-input" placeholder="Dakar" value="Dakar">
+                    </div>
+                </div>
+                
+                <!-- Champs cachés pour les coordonnées GPS -->
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+            </div>
+            
+            <div id="errorMsg" class="form-error" style="display: none; margin-bottom: 1rem;"></div>
+            
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1rem; border-radius: 50px;">
+                <i class="fas fa-paper-plane"></i> Publier l'annonce
+            </button>
+        </form>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/compression.js"></script>
+    <script src="js/listings.js"></script>
+    <script>
+        // Charger le nombre de messages non lus
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:5000/api/chat/conversations', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.conversations) {
+                    const totalUnread = data.conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+                    const badge = document.getElementById('unreadBadge');
+                    if (badge && totalUnread > 0) {
+                        badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                        badge.style.display = 'inline-block';
+                    }
+                }
+            })
+            .catch(console.error);
+        }
+    </script>
+</body>
+</html>

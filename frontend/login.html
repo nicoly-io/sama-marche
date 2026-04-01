@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: #f5f7fb;
+        }
+        
+        .login-card {
+            max-width: 450px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        body.dark-mode .login-card {
+            background: #1F2937;
+        }
+        
+        .login-header {
+            padding: 2rem 2rem 0.5rem 2rem;
+            text-align: center;
+        }
+        
+        .login-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        body.dark-mode .login-header h2 {
+            color: #F9FAFB;
+        }
+        
+        .login-header p {
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+        
+        .login-body {
+            padding: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6B7280;
+            margin-bottom: 0.5rem;
+        }
+        
+        body.dark-mode .form-label {
+            color: #9CA3AF;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+            font-size: 1rem;
+        }
+        
+        .modern-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            font-size: 0.875rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body.dark-mode .modern-input {
+            background: #374151;
+            border-color: #4B5563;
+            color: #F9FAFB;
+        }
+        
+        .modern-input:focus {
+            outline: none;
+            border-color: #0D9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+        
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 0.5rem;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-google {
+            width: 100%;
+            background: white;
+            border: 1px solid #E5E7EB;
+            color: #1F2937;
+            padding: 0.875rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        body.dark-mode .btn-google {
+            background: #374151;
+            border-color: #4B5563;
+            color: #F9FAFB;
+        }
+        
+        .btn-google:hover {
+            background: #F9FAFB;
+            transform: translateY(-2px);
+        }
+        
+        body.dark-mode .btn-google:hover {
+            background: #4B5563;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #9CA3AF;
+            font-size: 0.75rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .divider span {
+            margin: 0 1rem;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+        
+        .register-link a {
+            color: #0D9488;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="flex items-center gap-2" id="authButtons"></div>
+                <button id="themeToggle" class="theme-toggle" title="Mode sombre/clair">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Bienvenue</h2>
+                <p>Connectez-vous à votre compte</p>
+            </div>
+            <div class="login-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" class="modern-input" placeholder="exemple@email.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" class="modern-input" placeholder="••••••" required>
+                        </div>
+                    </div>
+                    <div id="errorMsg" class="form-error" style="display: none; margin-bottom: 1rem;"></div>
+                    <button type="submit" class="btn-login">Se connecter</button>
+                    
+                    <div class="divider">
+                        <span>ou</span>
+                    </div>
+                    
+                    <button type="button" id="googleLoginBtn" class="btn-google">
+                        <i class="fab fa-google"></i> Continuer avec Google
+                    </button>
+                </form>
+                
+                <div class="register-link">
+                    Pas encore de compte ? <a href="register.html">S'inscrire</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Traitement du retour Google (token dans l'URL)
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const userParam = urlParams.get('user');
+        const error = urlParams.get('error');
+        
+        if (error === 'google_auth_failed') {
+            showMessage('errorMsg', 'Échec de l\'authentification Google');
+        }
+        
+        if (token && userParam) {
+            try {
+                const user = JSON.parse(decodeURIComponent(userParam));
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+                window.location.href = 'dashboard.html';
+            } catch (e) {
+                console.error('Erreur lors du traitement du retour Google:', e);
+                showMessage('errorMsg', 'Erreur lors de la connexion avec Google');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditions générales - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: #f5f7fb;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .legal-card {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        body.dark-mode .legal-card {
+            background: #1F2937;
+        }
+        
+        .legal-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+        }
+        
+        .legal-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .legal-header p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .legal-body {
+            padding: 2rem;
+        }
+        
+        .legal-body h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0D9488;
+            margin: 1.5rem 0 0.75rem 0;
+        }
+        
+        .legal-body h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin: 1rem 0 0.5rem 0;
+        }
+        
+        body.dark-mode .legal-body h3 {
+            color: #F9FAFB;
+        }
+        
+        .legal-body p {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #4B5563;
+            margin-bottom: 1rem;
+        }
+        
+        body.dark-mode .legal-body p {
+            color: #9CA3AF;
+        }
+        
+        .legal-body ul {
+            margin: 0.5rem 0 1rem 1.5rem;
+        }
+        
+        .legal-body li {
+            font-size: 0.875rem;
+            color: #4B5563;
+            margin-bottom: 0.5rem;
+        }
+        
+        body.dark-mode .legal-body li {
+            color: #9CA3AF;
+        }
+        
+        .legal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #E5E7EB;
+            text-align: center;
+        }
+        
+        body.dark-mode .legal-footer {
+            border-color: #374151;
+        }
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .btn-back:hover {
+            transform: translateY(-2px);
+        }
+        
+        .date {
+            font-size: 0.75rem;
+            color: #9CA3AF;
+            margin-top: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="flex items-center gap-2" id="authButtons"></div>
+                <button id="themeToggle" class="theme-toggle" title="Mode sombre/clair">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="legal-card">
+            <div class="legal-header">
+                <h1>Conditions Générales d'Utilisation</h1>
+                <p>Dernière mise à jour : 1er avril 2026</p>
+            </div>
+            <div class="legal-body">
+                <h2>1. Objet</h2>
+                <p>Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de la plateforme Sama-Marche, une marketplace de vente entre particuliers au Sénégal.</p>
+                
+                <h2>2. Acceptation des conditions</h2>
+                <p>L'inscription sur Sama-Marche implique l'acceptation pleine et entière des présentes CGU. Si vous n'acceptez pas ces conditions, vous ne pouvez pas utiliser la plateforme.</p>
+                
+                <h2>3. Inscription et compte utilisateur</h2>
+                <p>Pour utiliser Sama-Marche, vous devez créer un compte en fournissant des informations exactes et complètes. Vous êtes responsable de la confidentialité de vos identifiants de connexion.</p>
+                
+                <h2>4. Vérification d'identité</h2>
+                <p>Pour renforcer la confiance entre utilisateurs, Sama-Marche propose un système de vérification d'identité via CNI. Le badge "Vérifié" est attribué après validation par notre équipe.</p>
+                
+                <h2>5. Dépôt d'annonces</h2>
+                <p>Les annonces déposées doivent respecter la législation sénégalaise. Sont interdits : les produits contrefaits, les armes, les stupéfiants, et tout objet dont la vente est illégale.</p>
+                
+                <h2>6. Séquestre (Escrow)</h2>
+                <p>Sama-Marche utilise un système de séquestre : l'argent de l'acheteur est bloqué jusqu'à la confirmation de livraison. Les fonds sont ensuite transférés au vendeur après validation par l'acheteur.</p>
+                
+                <h2>7. Frais de service</h2>
+                <p>Une commission de 6% du prix de vente est prélevée sur chaque transaction. Cette commission couvre les frais de séquestre, de plateforme et de support.</p>
+                
+                <h2>8. Litiges</h2>
+                <p>En cas de litige entre un acheteur et un vendeur, Sama-Marche peut intervenir pour trancher et procéder au remboursement ou au paiement selon les preuves fournies.</p>
+                
+                <h2>9. Responsabilité</h2>
+                <p>Sama-Marche agit comme intermédiaire et n'est pas responsable de la qualité des biens vendus, ni des transactions entre utilisateurs. Nous mettons en place les outils nécessaires à une transaction sécurisée.</p>
+                
+                <h2>10. Suspension de compte</h2>
+                <p>Nous nous réservons le droit de suspendre ou supprimer tout compte en cas de non-respect des présentes conditions.</p>
+                
+                <h2>11. Modification des conditions</h2>
+                <p>Sama-Marche peut modifier ses CGU à tout moment. Les utilisateurs seront informés des changements et devront les accepter pour continuer à utiliser la plateforme.</p>
+                
+                <h2>12. Loi applicable</h2>
+                <p>Les présentes CGU sont régies par le droit sénégalais. Tout litige sera porté devant les tribunaux compétents de Dakar.</p>
+            </div>
+            <div class="legal-footer">
+                <a href="register.html" class="btn-back"><i class="fas fa-arrow-left"></i> Retour à l'inscription</a>
+                <div class="date">© 2026 Sama-Marche. Tous droits réservés.</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Gestion du thème
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+        
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            });
+        }
+        
+        // Affichage des boutons selon connexion
+        const token = localStorage.getItem('token');
+        const authButtons = document.getElementById('authButtons');
+        
+        if (authButtons) {
+            if (token) {
+                authButtons.innerHTML = `
+                    <a href="dashboard.html" class="btn-nav btn-nav-primary">
+                        <i class="fas fa-user-circle"></i> Mon compte
+                    </a>
+                    <a href="chat.html" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-comment-dots"></i> Messages
+                    </a>
+                    <button id="logoutHeaderBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                `;
+                
+                document.getElementById('logoutHeaderBtn')?.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'index.html';
+                });
+            } else {
+                authButtons.innerHTML = `
+                    <a href="login.html" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-in-alt"></i> Connexion
+                    </a>
+                    <a href="register.html" class="btn-nav btn-nav-primary">
+                        <i class="fas fa-user-plus"></i> Inscription
+                    </a>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon compte - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Typographie */
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        h1, h2, h3, h4, .logo {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Styles pour le header amélioré */
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-nav i {
+            font-size: 1rem;
+        }
+        
+        .btn-nav-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .btn-nav-outline:hover {
+            background: var(--gray-100);
+            transform: translateY(-2px);
+        }
+        
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
+        }
+        
+        .btn-nav-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-nav-icon {
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .btn-nav-icon:hover {
+            background: var(--gray-100);
+            transform: scale(1.05);
+        }
+        
+        .btn-relative {
+            position: relative;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            display: none;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h3:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+        
+        /* Sidebar améliorée */
+        .sidebar-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        body.dark-mode .sidebar-card {
+            background: #1F2937;
+        }
+        
+        /* Avatar */
+        .avatar-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .avatar-status {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 16px;
+            height: 16px;
+            background-color: #10B981;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        /* Statistiques */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-number {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+        
+        /* Navigation */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .nav-link i {
+            width: 24px;
+            font-size: 1.125rem;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--gray-100);
+            color: var(--primary);
+        }
+        
+        body.dark-mode .nav-link:hover {
+            background-color: #374151;
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        /* Bouton gradient */
+        .btn-gradient {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            justify-content: center;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+        
+        /* État vide visuel */
+        .empty-state-visual {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 24px;
+            overflow: hidden;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        body.dark-mode .empty-state-visual {
+            background: linear-gradient(135deg, #064E3B 0%, #065F46 100%);
+        }
+        
+        .empty-state-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 3rem 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .empty-state-image {
+            margin-bottom: 2rem;
+        }
+        
+        .empty-state-image img {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+        }
+        
+        .empty-state-text h3 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        body.dark-mode .empty-state-text h3 {
+            color: white;
+        }
+        
+        .empty-state-text p {
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        
+        .empty-state-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .feature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .feature i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .feature span {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        
+        /* Grille des annonces */
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .listing-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-mode .listing-card {
+            background: #1F2937;
+        }
+        
+        .listing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+        }
+        
+        .listing-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .listing-content {
+            padding: 1rem;
+        }
+        
+        .listing-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #111827;
+            text-decoration: none;
+        }
+        
+        body.dark-mode .listing-title {
+            color: #F9FAFB;
+        }
+        
+        .listing-price {
+            font-weight: 800;
+            font-size: 1.125rem;
+            color: var(--primary);
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--gray-200);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .empty-state-features {
+                gap: 1rem;
+            }
+            
+            .empty-state-text h3 {
+                font-size: 1.25rem;
+            }
+            
+            .header-buttons {
+                gap: 0.5rem;
+            }
+            
+            .btn-nav {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="header-buttons">
+                    <a href="index.html" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-home"></i> Accueil
+                    </a>
+                    <a href="chat.html" class="btn-nav btn-nav-outline btn-relative">
+                        <i class="fas fa-comment-dots"></i> Messages
+                        <span id="unreadBadge" class="unread-badge">0</span>
+                    </a>
+                    <button id="logoutBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                    <button id="themeToggle" class="btn-nav-icon" title="Mode sombre/clair">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0;">
+        <div class="grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
+            <!-- Sidebar améliorée -->
+            <div class="sidebar-card">
+                <div class="card-body" style="padding: 1.5rem;">
+                    <div class="text-center" style="margin-bottom: 1.5rem;">
+                        <div class="avatar-wrapper">
+                            <div id="avatar" style="width: 100px; height: 100px; background: var(--gray-200); border-radius: 50%; margin: 0 auto 0.5rem; background-size: cover; background-position: center;"></div>
+                            <div class="avatar-status"></div>
+                        </div>
+                        <h4 id="profileName" style="margin-top: 0.75rem; font-weight: 700;"></h4>
+                        <p id="profilePhone" class="text-sm text-gray-500"><i class="fas fa-phone-alt"></i> <span id="profilePhoneSpan"></span></p>
+                        <div id="profileBadges" class="flex justify-center gap-1" style="margin-top: 0.5rem;"></div>
+                    </div>
+                    
+                    <!-- Statistiques utilisateur -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="statListings">0</div>
+                            <div class="stat-label">Annonces</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="statSales">0</div>
+                            <div class="stat-label">Ventes</div>
+                        </div>
+                    </div>
+                    
+                    <hr style="margin: 1rem 0;">
+                    
+                    <nav class="flex flex-col gap-2">
+                        <a href="#" data-tab="listings" class="nav-link">
+                            <i class="fas fa-box"></i> Mes annonces
+                        </a>
+                        <a href="#" data-tab="transactions" class="nav-link">
+                            <i class="fas fa-exchange-alt"></i> Mes transactions
+                        </a>
+                        <a href="#" data-tab="profile" class="nav-link">
+                            <i class="fas fa-user-circle"></i> Mon profil
+                        </a>
+                        <a href="#" data-tab="cni" class="nav-link">
+                            <i class="fas fa-id-card"></i> Vérifier mon identité
+                        </a>
+                        <a href="new-listing.html" class="btn-gradient" style="margin-top: 0.5rem; justify-content: center;">
+                            <i class="fas fa-plus-circle"></i> Nouvelle annonce
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div id="tabContent">
+                <div id="listingsTab" class="tab-pane">
+                    <h3><i class="fas fa-box"></i> Mes annonces</h3>
+                    <div id="userListings" class="listings-grid" style="margin-top: 1rem;"></div>
+                </div>
+                <div id="transactionsTab" class="tab-pane" style="display: none;">
+                    <h3><i class="fas fa-exchange-alt"></i> Mes transactions</h3>
+                    <div id="userTransactions" style="margin-top: 1rem;"></div>
+                </div>
+                <div id="profileTab" class="tab-pane" style="display: none;">
+                    <h3><i class="fas fa-user-circle"></i> Mon profil</h3>
+                    <div class="card" style="margin-top: 1rem;">
+                        <div class="card-body">
+                            <form id="profileForm">
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-user"></i> Nom complet</label>
+                                    <input type="text" id="profileFullName" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                                    <input type="email" id="profileEmail" class="form-input" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-phone"></i> Téléphone</label>
+                                    <input type="tel" id="profilePhoneInput" class="form-input" readonly>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Mettre à jour</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="cniTab" class="tab-pane" style="display: none;">
+                    <h3><i class="fas fa-id-card"></i> Vérification d'identité</h3>
+                    <div class="card" style="margin-top: 1rem;">
+                        <div class="card-body">
+                            <div id="cniStatus" style="padding: 0.75rem; border-radius: 8px; margin: 0.5rem 0;"></div>
+                            <form id="cniForm" style="margin-top: 1rem; display: none;">
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-camera"></i> Recto CNI</label>
+                                    <input type="file" id="cniRecto" accept="image/*" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-camera"></i> Verso CNI</label>
+                                    <input type="file" id="cniVerso" accept="image/*" class="form-input">
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Soumettre</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script>
+        // Charger le nombre de messages non lus
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:5000/api/chat/conversations', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.conversations) {
+                    const totalUnread = data.conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+                    const badge = document.getElementById('unreadBadge');
+                    if (badge && totalUnread > 0) {
+                        badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                        badge.style.display = 'inline-block';
+                    }
+                }
+            })
+            .catch(console.error);
+        }
+    </script>
+</body>
+</html>

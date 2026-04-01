@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Styles spécifiques à la page d'inscription */
+        body {
+            background: #f5f7fb;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body.dark-mode {
+            background: #111827;
+        }
+        
+        .register-card {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-mode .register-card {
+            background: #1F2937;
+        }
+        
+        .register-header {
+            padding: 2rem 2rem 0.5rem 2rem;
+            text-align: center;
+        }
+        
+        .register-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        body.dark-mode .register-header h2 {
+            color: #F9FAFB;
+        }
+        
+        .register-header p {
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+        
+        .register-body {
+            padding: 2rem;
+        }
+        
+        /* Zone de photo de profil */
+        .avatar-upload {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .avatar-preview {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #F3F4F6;
+            border: 2px dashed #D1D5DB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        body.dark-mode .avatar-preview {
+            background: #374151;
+            border-color: #4B5563;
+        }
+        
+        .avatar-preview:hover {
+            border-color: #0D9488;
+            background: #E6F7F5;
+        }
+        
+        .avatar-preview.has-image {
+            border: 2px solid #0D9488;
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-preview .upload-icon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #0D9488;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 2px solid white;
+        }
+        
+        .avatar-preview .placeholder-icon {
+            font-size: 2rem;
+            color: #9CA3AF;
+        }
+        
+        /* Champs de formulaire modernes */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6B7280;
+            margin-bottom: 0.5rem;
+        }
+        
+        body.dark-mode .form-label {
+            color: #9CA3AF;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+            font-size: 1rem;
+        }
+        
+        .modern-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            font-size: 0.875rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body.dark-mode .modern-input {
+            background: #374151;
+            border-color: #4B5563;
+            color: #F9FAFB;
+        }
+        
+        .modern-input:focus {
+            outline: none;
+            border-color: #0D9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+        
+        /* Checkbox conditions */
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+        
+        .terms-checkbox input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: #0D9488;
+            cursor: pointer;
+        }
+        
+        .terms-checkbox label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            line-height: 1.4;
+        }
+        
+        .terms-checkbox a {
+            color: #0D9488;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Bouton inscription */
+        .btn-register {
+            width: 100%;
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Bouton Google */
+        .btn-google {
+            width: 100%;
+            background: white;
+            border: 1px solid #E5E7EB;
+            color: #1F2937;
+            padding: 0.875rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        body.dark-mode .btn-google {
+            background: #374151;
+            border-color: #4B5563;
+            color: #F9FAFB;
+        }
+        
+        .btn-google:hover {
+            background: #F9FAFB;
+            transform: translateY(-2px);
+        }
+        
+        body.dark-mode .btn-google:hover {
+            background: #4B5563;
+        }
+        
+        .btn-google i {
+            font-size: 1.1rem;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #9CA3AF;
+            font-size: 0.75rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .divider span {
+            margin: 0 1rem;
+        }
+        
+        /* Lien connexion */
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+        
+        .login-link a {
+            color: #0D9488;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .register-body {
+                padding: 1.5rem;
+            }
+            .register-header {
+                padding: 1.5rem 1.5rem 0 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="flex items-center gap-2" id="authButtons"></div>
+                <button id="themeToggle" class="theme-toggle" title="Mode sombre/clair">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
+        <div class="register-card">
+            <div class="register-header">
+                <h2>Créer un compte</h2>
+                <p>Rejoignez la communauté Sama-Marche</p>
+            </div>
+            <div class="register-body">
+                <form id="registerForm">
+                    <!-- Photo de profil - style cercle avec icône -->
+                    <div class="avatar-upload">
+                        <div class="avatar-preview" id="avatarPreviewContainer">
+                            <div class="placeholder-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <div class="upload-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                        </div>
+                        <input type="file" id="avatar" accept="image/*" style="display: none;">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nom complet</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="fullName" class="modern-input" placeholder="Votre nom et prénom" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" class="modern-input" placeholder="exemple@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Téléphone (+221)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone-alt"></i>
+                            <input type="tel" id="phone" class="modern-input" placeholder="77 123 45 67" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" class="modern-input" placeholder="••••••" required>
+                        </div>
+                    </div>
+
+                    <!-- Section OTP (cachée initialement) -->
+                    <div id="otpSection" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Code de vérification (SMS)</label>
+                            <div class="flex" style="gap: 0.5rem;">
+                                <input type="text" id="otpCode" class="modern-input" placeholder="6 chiffres" style="flex: 1;">
+                                <button type="button" id="verifyOtpBtn" class="btn-register" style="width: auto; padding: 0.875rem 1.5rem;">Vérifier</button>
+                            </div>
+                            <div class="text-center" style="margin-top: 0.5rem;">
+                                <button type="button" id="resendOtpBtn" class="btn btn-outline btn-sm">📱 Renvoyer le code</button>
+                            </div>
+                            <div id="countdown" class="text-xs text-gray-500" style="margin-top: 0.25rem;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Conditions d'utilisation (liens corrigés) -->
+                    <div class="terms-checkbox">
+                        <input type="checkbox" id="acceptTerms" required>
+                        <label for="acceptTerms">
+                            J'accepte les <a href="terms.html" target="_blank">Conditions générales d'utilisation</a> 
+                            et la <a href="privacy.html" target="_blank">Politique de confidentialité</a>
+                        </label>
+                    </div>
+
+                    <div id="errorMsg" class="form-error" style="display: none; margin-bottom: 1rem;"></div>
+
+                    <button type="button" id="sendOtpBtn" class="btn-register">Créer mon compte</button>
+
+                    <div class="divider">
+                        <span>ou</span>
+                    </div>
+
+                    <button type="button" id="googleLoginBtn" class="btn-google">
+                        <i class="fab fa-google"></i> Continuer avec Google
+                    </button>
+                </form>
+
+                <div class="login-link">
+                    Déjà un compte ? <a href="login.html">Se connecter</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

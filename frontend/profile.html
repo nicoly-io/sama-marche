@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon profil - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Styles pour le header amélioré */
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-nav i {
+            font-size: 1rem;
+        }
+        
+        .btn-nav-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .btn-nav-outline:hover {
+            background: var(--gray-100);
+            transform: translateY(-2px);
+        }
+        
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
+        }
+        
+        .btn-nav-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-nav-icon {
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .btn-nav-icon:hover {
+            background: var(--gray-100);
+            transform: scale(1.05);
+        }
+        
+        .btn-relative {
+            position: relative;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            display: none;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        /* Style pour le bouton thème */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--gray-200);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-buttons {
+                gap: 0.5rem;
+            }
+            
+            .btn-nav {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="header-buttons">
+                    <a href="chat.html" class="btn-nav btn-nav-outline btn-relative">
+                        <i class="fas fa-comment-dots"></i> Messages
+                        <span id="unreadBadge" class="unread-badge">0</span>
+                    </a>
+                    <span id="userName" style="font-size: 0.875rem;"></span>
+                    <button id="logoutBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                    <button id="themeToggle" class="btn-nav-icon" title="Mode sombre/clair">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0; max-width: 600px; margin: 0 auto;">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-user-circle"></i> Mon profil</h3>
+            </div>
+            <div class="card-body">
+                <!-- Avatar et badges -->
+                <div class="text-center" style="margin-bottom: 2rem;">
+                    <div id="avatar" style="width: 100px; height: 100px; background: var(--gray-200); border-radius: 50%; margin: 0 auto 1rem; background-size: cover; background-position: center;"></div>
+                    <div id="profileBadges" class="flex justify-center gap-2"></div>
+                </div>
+
+                <!-- Formulaire profil -->
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-user"></i> Nom complet</label>
+                        <input type="text" id="fullName" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="email" class="form-input" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-phone"></i> Téléphone</label>
+                        <input type="tel" id="phone" class="form-input" readonly>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-save"></i> Mettre à jour
+                    </button>
+                </form>
+
+                <hr style="margin: 1.5rem 0;">
+
+                <!-- Vérification CNI -->
+                <div id="cniSection">
+                    <h4><i class="fas fa-id-card"></i> Vérification d'identité</h4>
+                    <div id="cniStatus" class="alert" style="padding: 0.75rem; border-radius: 8px; margin: 0.5rem 0;"></div>
+                    <div id="cniFormContainer" style="display: none;">
+                        <form id="cniUploadForm" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-camera"></i> Recto CNI</label>
+                                <input type="file" id="cniRecto" accept="image/*" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-camera"></i> Verso CNI</label>
+                                <input type="file" id="cniVerso" accept="image/*" class="form-input" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-upload"></i> Soumettre pour vérification
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <hr style="margin: 1.5rem 0;">
+
+                <!-- Abonnement pro -->
+                <div id="subscriptionSection">
+                    <h4><i class="fas fa-star"></i> Compte professionnel</h4>
+                    <div id="subscriptionInfo"></div>
+                    <button id="upgradeBtn" class="btn btn-outline btn-block" style="margin-top: 0.5rem;">
+                        <i class="fas fa-rocket"></i> Devenir professionnel
+                    </button>
+                </div>
+
+                <hr style="margin: 1.5rem 0;">
+
+                <!-- Statistiques -->
+                <div>
+                    <h4><i class="fas fa-chart-line"></i> Mes statistiques</h4>
+                    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                        <div class="text-center">
+                            <div id="statsListings" class="text-xl font-bold">0</div>
+                            <div class="text-xs"><i class="fas fa-box"></i> Annonces</div>
+                        </div>
+                        <div class="text-center">
+                            <div id="statsSales" class="text-xl font-bold">0</div>
+                            <div class="text-xs"><i class="fas fa-money-bill-wave"></i> Ventes</div>
+                        </div>
+                        <div class="text-center">
+                            <div id="statsViews" class="text-xl font-bold">0</div>
+                            <div class="text-xs"><i class="fas fa-eye"></i> Vues totales</div>
+                        </div>
+                        <div class="text-center">
+                            <div id="statsRating" class="text-xl font-bold">0</div>
+                            <div class="text-xs"><i class="fas fa-star"></i> Évaluations</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/profile.js"></script>
+    <script>
+        // Charger le nombre de messages non lus
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:5000/api/chat/conversations', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.conversations) {
+                    const totalUnread = data.conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+                    const badge = document.getElementById('unreadBadge');
+                    if (badge && totalUnread > 0) {
+                        badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                        badge.style.display = 'inline-block';
+                    }
+                }
+            })
+            .catch(console.error);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messagerie - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Styles pour le header amélioré */
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-nav i {
+            font-size: 1rem;
+        }
+        
+        .btn-nav-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .btn-nav-outline:hover {
+            background: var(--gray-100);
+            transform: translateY(-2px);
+        }
+        
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
+        }
+        
+        .btn-nav-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-nav-icon {
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .btn-nav-icon:hover {
+            background: var(--gray-100);
+            transform: scale(1.05);
+        }
+        
+        .btn-relative {
+            position: relative;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            display: none;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        /* Typographie */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        h1, h2, h3, .logo {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Sidebar conversations - fond grisé */
+        .conversations-sidebar {
+            background: #f8f9fa;
+            border-radius: 20px;
+            height: 70vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        body.dark-mode .conversations-sidebar {
+            background: #1f2937;
+        }
+        
+        .conversations-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        body.dark-mode .conversations-header {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        
+        .conversations-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        
+        /* Élément de conversation */
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 0.25rem;
+        }
+        
+        .conversation-item:hover {
+            background: #e5e7eb;
+            transform: translateX(2px);
+        }
+        
+        body.dark-mode .conversation-item:hover {
+            background: #374151;
+        }
+        
+        .conversation-item.active {
+            background: linear-gradient(135deg, #e8f5f3 0%, #d1f0ec 100%);
+            border-left: 3px solid #0D9488;
+        }
+        
+        body.dark-mode .conversation-item.active {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+        }
+        
+        body.dark-mode .conversation-item.active .conversation-name {
+            color: white;
+        }
+        
+        .conversation-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .conversation-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .conversation-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .conversation-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        body.dark-mode .conversation-name {
+            color: #f9fafb;
+        }
+        
+        .conversation-listing {
+            font-size: 0.7rem;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .conversation-badge {
+            background: #0D9488;
+            color: white;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        /* Zone de chat */
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        body.dark-mode .chat-container {
+            background: #1f2937;
+        }
+        
+        .chat-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        body.dark-mode .chat-header {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        
+        .chat-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: #fafafa;
+        }
+        
+        body.dark-mode .chat-messages {
+            background: #111827;
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .message-sent {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-received {
+            background: white;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        body.dark-mode .message-received {
+            background: #374151;
+            color: #f9fafb;
+        }
+        
+        .message-time {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+            text-align: right;
+        }
+        
+        /* Empty state */
+        .empty-state-chat {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        
+        .empty-state-chat i {
+            font-size: 4rem;
+            color: #0D9488;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-chat h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-chat p {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        /* Barre d'envoi moderne */
+        .chat-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        body.dark-mode .chat-input-wrapper {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: #f9fafb;
+        }
+        
+        body.dark-mode .chat-input {
+            background: #374151;
+            border-color: #4b5563;
+            color: white;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #0D9488;
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+        }
+        
+        .chat-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chat-action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .chat-action-btn:hover {
+            background: #f3f4f6;
+            color: #0D9488;
+        }
+        
+        body.dark-mode .chat-action-btn:hover {
+            background: #374151;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            border: none;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(13,148,136,0.3);
+        }
+        
+        /* Bouton thème */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--gray-200);
+            transform: scale(1.1);
+        }
+        
+        /* Scrollbar personnalisée */
+        .conversations-list::-webkit-scrollbar,
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .conversations-list::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        
+        .conversations-list::-webkit-scrollbar-thumb {
+            background: #0D9488;
+            border-radius: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .conversations-sidebar {
+                height: 40vh;
+            }
+            
+            .chat-container {
+                height: 50vh;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .header-buttons {
+                gap: 0.5rem;
+            }
+            
+            .btn-nav {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="header-buttons">
+                    <a href="index.html" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-home"></i> Accueil
+                    </a>
+                    <a href="chat.html" class="btn-nav btn-nav-outline btn-relative">
+                        <i class="fas fa-comment-dots"></i> Messages
+                        <span id="unreadBadge" class="unread-badge">0</span>
+                    </a>
+                    <span id="userName" style="font-size: 0.875rem;"></span>
+                    <button id="logoutBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                    <button id="themeToggle" class="btn-nav-icon" title="Mode sombre/clair">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0;">
+        <div class="grid" style="grid-template-columns: 340px 1fr; gap: 1.5rem;">
+            <!-- Sidebar conversations -->
+            <div class="conversations-sidebar">
+                <div class="conversations-header">
+                    <h3><i class="fas fa-comments" style="color: #0D9488;"></i> Mes conversations</h3>
+                </div>
+                <div id="conversationsList" class="conversations-list">
+                    <div class="text-center" style="padding: 2rem;">Chargement...</div>
+                </div>
+            </div>
+
+            <!-- Zone de chat -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3 id="chatTitle"><i class="fas fa-comment-dots" style="color: #0D9488;"></i> Messagerie</h3>
+                </div>
+                <div id="chatMessages" class="chat-messages">
+                    <div class="empty-state-chat">
+                        <i class="fas fa-comments"></i>
+                        <h4>💬 Sélectionnez une conversation</h4>
+                        <p>Choisissez une discussion pour commencer à échanger</p>
+                    </div>
+                </div>
+                <div class="chat-input-wrapper">
+                    <div class="chat-actions">
+                        <button class="chat-action-btn" id="attachBtn" title="Joindre un fichier">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <button class="chat-action-btn" id="emojiBtn" title="Emojis">
+                            <i class="fas fa-smile-wink"></i>
+                        </button>
+                    </div>
+                    <input type="text" id="messageInput" placeholder="Écrivez votre message..." class="chat-input">
+                    <button id="sendBtn" class="send-btn" title="Envoyer">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/chat.js"></script>
+    <script>
+        // Charger le nombre de messages non lus
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:5000/api/chat/conversations', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.conversations) {
+                    const totalUnread = data.conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+                    const badge = document.getElementById('unreadBadge');
+                    if (badge && totalUnread > 0) {
+                        badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                        badge.style.display = 'inline-block';
+                    }
+                }
+            })
+            .catch(console.error);
+        }
+    </script>
+</body>
+</html>
