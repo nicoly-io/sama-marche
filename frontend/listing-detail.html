@@ -245,11 +245,11 @@
     <script src="js/app.js"></script>
     <script src="js/listing-detail.js"></script>
     <script>
-        // Charger le nombre de messages non lus
-        const token = localStorage.getItem('token');
-        if (token) {
-            fetch('http://localhost:5000/api/chat/conversations', {
-                headers: { 'Authorization': 'Bearer ' + token }
+        // Charger le nombre de messages non lus - RENOMMÉ en authToken
+        const authToken = localStorage.getItem('token');
+        if (authToken) {
+            fetch('https://sama-marche.onrender.com/api/chat/conversations', {
+                headers: { 'Authorization': 'Bearer ' + authToken }
             })
             .then(r => r.json())
             .then(data => {
@@ -269,7 +269,7 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const loginBtn = document.getElementById('loginBtn');
         
-        if (token) {
+        if (authToken) {
             if (logoutBtn) logoutBtn.style.display = 'inline-flex';
             if (loginBtn) loginBtn.style.display = 'none';
         } else {
