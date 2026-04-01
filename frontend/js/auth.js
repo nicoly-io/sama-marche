@@ -129,13 +129,13 @@ function startCountdown(seconds = 60) {
     }, 1000);
 }
 
-// Fonction pour envoyer l'OTP
-async function sendOTP(phone, isResend = false) {
+// Fonction pour envoyer l'OTP (MODIFIÉE : ajout de l'email)
+async function sendOTP(phone, email, isResend = false) {
     try {
         const response = await fetch(`${API_URL}/auth/send-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone })
+            body: JSON.stringify({ phone, email }) // Ajout de l'email
         });
         
         const data = await response.json();
@@ -146,7 +146,7 @@ async function sendOTP(phone, isResend = false) {
                 if (otpSection) otpSection.style.display = 'block';
                 if (sendBtn) sendBtn.style.display = 'none';
             }
-            showMessage('errorMsg', 'Code SMS envoyé !', false);
+            showMessage('errorMsg', 'Code envoyé par email !', false);
             startCountdown(60);
         } else {
             showMessage('errorMsg', data.error);
@@ -182,8 +182,8 @@ if (registerForm) {
             let avatarBase64 = currentAvatarBase64;
             
             userData = { fullName, email, phone, password, avatar: avatarBase64 };
-            console.log('Envoi OTP pour:', phone);
-            await sendOTP(phone, false);
+            console.log('Envoi OTP pour:', phone, 'email:', email);
+            await sendOTP(phone, email, false); // MODIFIÉ : passage de l'email
         });
     }
     
@@ -194,7 +194,7 @@ if (registerForm) {
             const otpCode = document.getElementById('otpCode').value;
             
             if (!otpCode) {
-                showMessage('errorMsg', 'Entrez le code reçu par SMS');
+                showMessage('errorMsg', 'Entrez le code reçu par email');
                 return;
             }
             
@@ -238,7 +238,7 @@ if (registerForm) {
                 showMessage('errorMsg', 'Veuillez attendre avant de renvoyer un code');
                 return;
             }
-            await sendOTP(userData.phone, true);
+            await sendOTP(userData.phone, userData.email, true); // MODIFIÉ : passage de l'email
         });
     }
 }

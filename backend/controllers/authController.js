@@ -6,18 +6,26 @@ const { sendOTP } = require('../services/smsService');
 const { logSecurityEvent } = require('../middleware/security');
 const axios = require('axios');
 
-// Générer et envoyer OTP
+// Générer et envoyer OTP (par email)
 const sendOTPCode = async (req, res) => {
     try {
-        const { phone } = req.body;
+        const { phone, email } = req.body; // Ajout de email
         
         if (!phone) {
             return res.status(400).json({ error: 'Le numéro de téléphone est requis' });
         }
         
+        if (!email) {
+            return res.status(400).json({ error: 'L\'email est requis' });
+        }
+        
         const cleanPhone = phone.replace(/^\+221/, '');
         if (!validatePhone(cleanPhone)) {
             return res.status(400).json({ error: 'Numéro de téléphone sénégalais invalide' });
+        }
+        
+        if (!validateEmail(email)) {
+            return res.status(400).json({ error: 'Email invalide' });
         }
         
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -39,13 +47,14 @@ const sendOTPCode = async (req, res) => {
             return res.status(500).json({ error: 'Erreur lors de l\'envoi du code' });
         }
         
-        const smsResult = await sendOTP(cleanPhone, otpCode);
+        // Envoyer le code par email (gratuit) au lieu de SMS
+        const result = await sendOTP(cleanPhone, otpCode, email);
         
-        if (!smsResult.success) {
-            return res.status(500).json({ error: 'Erreur d\'envoi du SMS' });
+        if (!result.success) {
+            return res.status(500).json({ error: 'Erreur d\'envoi du code par email' });
         }
         
-        res.json({ success: true, message: 'Code envoyé par SMS' });
+        res.json({ success: true, message: 'Code envoyé par email' });
     } catch (error) {
         console.error('Send OTP error:', error);
         res.status(500).json({ error: 'Erreur serveur' });
@@ -277,7 +286,6 @@ const googleCallback = async (req, res) => {
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
         const redirectUri = `${process.env.APP_URL || 'http://localhost:5000'}/api/auth/google/callback`;
         
-        // Échanger le code contre un token d'accès
         const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
             code,
             client_id: clientId,
@@ -288,7 +296,6 @@ const googleCallback = async (req, res) => {
         
         const { access_token } = tokenResponse.data;
         
-        // Récupérer les infos utilisateur avec le token
         const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
             headers: { Authorization: `Bearer ${access_token}` }
         });
@@ -297,7 +304,6 @@ const googleCallback = async (req, res) => {
         
         console.log('Google User Info:', { id, email, name });
         
-        // Vérifier si l'utilisateur existe déjà
         let { data: user, error } = await supabase
             .from('users')
             .select('*')
@@ -305,7 +311,6 @@ const googleCallback = async (req, res) => {
             .maybeSingle();
         
         if (!user) {
-            // Créer un nouvel utilisateur
             const { data: newUser, error: createError } = await supabase
                 .from('users')
                 .insert({
@@ -324,7 +329,6 @@ const googleCallback = async (req, res) => {
             user = newUser;
             console.log('Nouvel utilisateur Google créé:', user.id);
         } else if (!user.google_id) {
-            // Mettre à jour l'utilisateur avec google_id
             await supabase
                 .from('users')
                 .update({ google_id: id, avatar_url: picture })
@@ -332,10 +336,8 @@ const googleCallback = async (req, res) => {
             user.google_id = id;
         }
         
-        // Générer le token JWT
         const token = generateToken(user.id, user.phone, user.email);
         
-        // Rediriger vers le frontend avec le token
         res.redirect(`${process.env.APP_URL || 'http://localhost:5000'}/login?token=${token}&user=${encodeURIComponent(JSON.stringify({
             id: user.id,
             email: user.email,
