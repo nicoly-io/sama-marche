@@ -96,7 +96,7 @@ if (avatarPreviewContainer && avatarInput) {
 let countdownInterval = null;
 let canResend = true;
 let userData = {};
-let currentOtpCode = null; // Stocker le code OTP
+let currentOtpCode = null;
 
 function startCountdown(seconds = 60) {
     let remaining = seconds;
@@ -127,7 +127,6 @@ function startCountdown(seconds = 60) {
 
 // Fonction pour afficher le code OTP dans la page
 function displayOtpCode(code) {
-    // Créer ou trouver l'élément d'affichage du code
     let otpDisplay = document.getElementById('otpDisplay');
     if (!otpDisplay) {
         otpDisplay = document.createElement('div');
@@ -148,46 +147,43 @@ function displayOtpCode(code) {
     }
     
     otpDisplay.innerHTML = `
-        <strong style="color: #0D9488;">📧 Code de vérification</strong><br>
+        <strong style="color: #0D9488;">📧 Code de vérification (TEST)</strong><br>
         <span style="font-size: 2rem; font-weight: bold; letter-spacing: 4px;">${code}</span>
         <p style="font-size: 0.8rem; margin-top: 0.5rem;">Ce code est valable 10 minutes</p>
     `;
 }
 
-// Fonction pour envoyer l'OTP (affiche le code dans la page)
+// Fonction pour envoyer l'OTP - GÉNÈRE UN CODE DE TEST
 async function sendOTP(phone, email, isResend = false) {
     try {
-        const response = await fetch(`${API_URL}/auth/send-otp`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, email })
-        });
+        // Générer un code de test à 6 chiffres
+        const testCode = Math.floor(100000 + Math.random() * 900000).toString();
+        currentOtpCode = testCode;
         
-        const data = await response.json();
-        if (response.ok) {
-            if (!isResend) {
-                const otpSection = document.getElementById('otpSection');
-                const sendBtn = document.getElementById('sendOtpBtn');
-                if (otpSection) otpSection.style.display = 'block';
-                if (sendBtn) sendBtn.style.display = 'none';
-            }
-            
-            // Récupérer le code depuis la réponse du backend
-            if (data.otpCode) {
-                currentOtpCode = data.otpCode;
-                displayOtpCode(data.otpCode);
-            } else {
-                // Fallback: code aléatoire si le backend ne renvoie pas le code
-                const fallbackCode = Math.floor(100000 + Math.random() * 900000).toString();
-                currentOtpCode = fallbackCode;
-                displayOtpCode(fallbackCode);
-            }
-            
-            showMessage('errorMsg', 'Code affiché ci-dessous !', false);
-            startCountdown(60);
-        } else {
-            showMessage('errorMsg', data.error);
+        // Afficher le code dans la page
+        displayOtpCode(testCode);
+        
+        if (!isResend) {
+            const otpSection = document.getElementById('otpSection');
+            const sendBtn = document.getElementById('sendOtpBtn');
+            if (otpSection) otpSection.style.display = 'block';
+            if (sendBtn) sendBtn.style.display = 'none';
         }
+        
+        showMessage('errorMsg', 'Code de test affiché ci-dessous !', false);
+        startCountdown(60);
+        
+        // Appeler le backend pour enregistrer le code (optionnel)
+        try {
+            await fetch(`${API_URL}/auth/send-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, email, testCode })
+            });
+        } catch (e) {
+            console.log('Backend appelé, mais code affiché localement');
+        }
+        
     } catch (error) {
         showMessage('errorMsg', 'Erreur d\'envoi du code');
     }
