@@ -2,7 +2,13 @@ const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { s3Client, BUCKET_NAME } = require('../config/cloudflare');
 
-// Uploader un fichier (inchangé)
+// Configuration : utiliser l'URL publique si disponible, sinon URLs signées
+const USE_PUBLIC_URL = true; // Mettre à true si le bucket est public
+
+// URL publique du bucket (à définir dans .env)
+const PUBLIC_URL = process.env.CLOUDFLARE_R2_PUBLIC_URL || '';
+
+// Uploader un fichier
 const uploadFile = async (filePath, destination, fileName) => {
     const { PutObjectCommand } = require('@aws-sdk/client-s3');
     const fs = require('fs');
@@ -48,9 +54,15 @@ const deleteFile = async (key) => {
     }
 };
 
-// Générer une URL signée (valable 1 heure)
+// Générer une URL pour un fichier (publique ou signée)
 const getFileUrl = async (key, expiresIn = 3600) => {
     try {
+        // Si une URL publique est configurée, l'utiliser (plus simple et plus rapide)
+        if (USE_PUBLIC_URL && PUBLIC_URL) {
+            return `${PUBLIC_URL}/${key}`;
+        }
+        
+        // Sinon, générer une URL signée (valable 1 heure)
         const command = new GetObjectCommand({
             Bucket: BUCKET_NAME,
             Key: key
@@ -59,7 +71,7 @@ const getFileUrl = async (key, expiresIn = 3600) => {
         const url = await getSignedUrl(s3Client, command, { expiresIn });
         return url;
     } catch (error) {
-        console.error('Get signed URL error:', error);
+        console.error('Get URL error:', error);
         return null;
     }
 };

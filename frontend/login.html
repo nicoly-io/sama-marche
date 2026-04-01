@@ -191,6 +191,79 @@
             text-decoration: none;
             font-weight: 600;
         }
+        
+        /* Style pour le bouton thème */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--gray-200);
+            transform: scale(1.1);
+        }
+        
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-nav-outline {
+            background: transparent;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+        }
+        
+        .btn-nav-outline:hover {
+            background: #F3F4F6;
+            transform: translateY(-2px);
+        }
+        
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            color: white;
+            border: none;
+        }
+        
+        .btn-nav-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-relative {
+            position: relative;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 9px;
+            display: none;
+            min-width: 16px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -249,25 +322,65 @@
     <script src="js/app.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Traitement du retour Google (token dans l'URL)
+        // Traitement du retour Google (token dans l'URL) - Variable renommée pour éviter conflit
         const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
+        const googleToken = urlParams.get('token');  // Renommé pour éviter conflit
         const userParam = urlParams.get('user');
         const error = urlParams.get('error');
         
         if (error === 'google_auth_failed') {
-            showMessage('errorMsg', 'Échec de l\'authentification Google');
+            if (typeof showMessage === 'function') {
+                showMessage('errorMsg', 'Échec de l\'authentification Google');
+            }
         }
         
-        if (token && userParam) {
+        if (googleToken && userParam) {
             try {
                 const user = JSON.parse(decodeURIComponent(userParam));
-                localStorage.setItem('token', token);
+                localStorage.setItem('token', googleToken);
                 localStorage.setItem('user', JSON.stringify(user));
                 window.location.href = 'dashboard.html';
             } catch (e) {
                 console.error('Erreur lors du traitement du retour Google:', e);
-                showMessage('errorMsg', 'Erreur lors de la connexion avec Google');
+                if (typeof showMessage === 'function') {
+                    showMessage('errorMsg', 'Erreur lors de la connexion avec Google');
+                }
+            }
+        }
+        
+        // Gestion de l'affichage des boutons dans le header
+        const authToken = localStorage.getItem('token');
+        const authButtons = document.getElementById('authButtons');
+        
+        if (authButtons) {
+            if (authToken) {
+                authButtons.innerHTML = `
+                    <a href="dashboard.html" class="btn-nav btn-nav-primary">
+                        <i class="fas fa-user-circle"></i> Mon compte
+                    </a>
+                    <a href="chat.html" class="btn-nav btn-nav-outline btn-relative">
+                        <i class="fas fa-comment-dots"></i> Messages
+                        <span id="unreadBadge" class="unread-badge">0</span>
+                    </a>
+                    <button id="logoutHeaderBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                `;
+                
+                document.getElementById('logoutHeaderBtn')?.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'index.html';
+                });
+            } else {
+                authButtons.innerHTML = `
+                    <a href="login.html" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-in-alt"></i> Connexion
+                    </a>
+                    <a href="register.html" class="btn-nav btn-nav-primary">
+                        <i class="fas fa-user-plus"></i> Inscription
+                    </a>
+                `;
             }
         }
     </script>
