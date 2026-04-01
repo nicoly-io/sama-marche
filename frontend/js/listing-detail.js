@@ -25,23 +25,32 @@ try {
     }
 } catch(e) {}
 
+console.log('authToken présent:', !!authToken);
+console.log('currentUserId:', currentUserId);
+
 // Attendre que le DOM soit prêt
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM chargé');
     loadListing();
-    setupAuthButtons();
 });
 
 // Charger l'annonce
 async function loadListing() {
     try {
+        console.log('Chargement annonce ID:', listingId);
         const response = await fetch(`${API_URL}/listings/${listingId}`);
         const data = await response.json();
         currentListing = data.listing;
         
+        console.log('Annonce chargée:', currentListing.title);
+        console.log('user_id de l\'annonce:', currentListing.user_id);
+        console.log('currentUserId:', currentUserId);
+        
         displayListing();
         setupButtons();
+        setupAuthButtons();
     } catch (error) {
-        console.error('Erreur:', error);
+        console.error('Erreur chargement:', error);
         document.querySelector('main').innerHTML = '<div class="text-center" style="padding: 3rem;">Erreur de chargement</div>';
     }
 }
@@ -100,15 +109,21 @@ function displayListing() {
 // Configurer les boutons
 function setupButtons() {
     const isOwner = (currentUserId && currentListing.user_id === currentUserId);
+    console.log('Est propriétaire:', isOwner);
+    console.log('currentUserId:', currentUserId);
+    console.log('listing.user_id:', currentListing.user_id);
     
+    // Bouton Acheter
     const buyBtn = document.getElementById('buyNowBtn');
     if (buyBtn) {
         if (isOwner) {
             buyBtn.style.display = 'none';
+            console.log('Bouton acheter caché (propriétaire)');
         } else {
             buyBtn.style.display = 'block';
             buyBtn.onclick = function(e) {
                 e.preventDefault();
+                console.log('Clic sur Acheter - authToken:', !!authToken);
                 if (!authToken) {
                     window.location.href = `login.html?redirect=checkout.html?id=${listingId}`;
                 } else {
@@ -116,6 +131,7 @@ function setupButtons() {
                 }
                 return false;
             };
+            console.log('Bouton acheter configuré');
         }
     }
     
@@ -124,10 +140,12 @@ function setupButtons() {
     if (contactBtn) {
         if (isOwner) {
             contactBtn.style.display = 'none';
+            console.log('Bouton contacter caché (propriétaire)');
         } else {
             contactBtn.style.display = 'block';
             contactBtn.onclick = function(e) {
                 e.preventDefault();
+                console.log('Clic sur Contacter - authToken:', !!authToken);
                 if (!authToken) {
                     window.location.href = `login.html?redirect=listing-detail.html?id=${listingId}`;
                 } else {
@@ -135,13 +153,16 @@ function setupButtons() {
                 }
                 return false;
             };
+            console.log('Bouton contacter configuré');
         }
     }
     
+    // Bouton Partager
     const shareBtn = document.getElementById('shareBtn');
     if (shareBtn) {
         shareBtn.onclick = function(e) {
             e.preventDefault();
+            console.log('Clic sur Partager');
             if (navigator.share) {
                 navigator.share({
                     title: currentListing.title,
@@ -155,11 +176,13 @@ function setupButtons() {
         };
     }
     
+    // Bouton Signaler
     const reportBtn = document.getElementById('reportBtn');
     const reportModal = document.getElementById('reportModal');
     if (reportBtn && reportModal) {
         reportBtn.onclick = function(e) {
             e.preventDefault();
+            console.log('Clic sur Signaler');
             reportModal.style.display = 'flex';
             return false;
         };
