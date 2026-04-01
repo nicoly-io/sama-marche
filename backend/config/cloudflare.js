@@ -8,6 +8,7 @@ const s3Client = new S3Client({
         accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY,
         secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_KEY,
     },
+    forcePathStyle: true  // Important pour Cloudflare R2
 });
 
 const BUCKET_NAME = process.env.CLOUDFLARE_R2_BUCKET || 'sama-marche-storage';
