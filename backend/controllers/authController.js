@@ -9,7 +9,7 @@ const axios = require('axios');
 // Générer et envoyer OTP (par email)
 const sendOTPCode = async (req, res) => {
     try {
-        const { phone, email } = req.body; // Ajout de email
+        const { phone, email } = req.body;
         
         if (!phone) {
             return res.status(400).json({ error: 'Le numéro de téléphone est requis' });
@@ -47,7 +47,6 @@ const sendOTPCode = async (req, res) => {
             return res.status(500).json({ error: 'Erreur lors de l\'envoi du code' });
         }
         
-        // Envoyer le code par email (gratuit) au lieu de SMS
         const result = await sendOTP(cleanPhone, otpCode, email);
         
         if (!result.success) {
@@ -264,10 +263,12 @@ const login = async (req, res) => {
 // Google Login - Redirection vers Google
 const googleLogin = (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    const redirectUri = `${process.env.APP_URL || 'http://localhost:5000'}/api/auth/google/callback`;
+    // Utiliser APP_URL depuis l'environnement
+    const appUrl = process.env.APP_URL || 'http://localhost:5000';
+    const redirectUri = `${appUrl}/api/auth/google/callback`;
     const scope = 'email profile';
     
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
     
     console.log('Google Login - Redirection vers:', authUrl);
     res.redirect(authUrl);
@@ -284,7 +285,8 @@ const googleCallback = async (req, res) => {
         
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-        const redirectUri = `${process.env.APP_URL || 'https://sama-marche.onrender.com'}/api/auth/google/callback`;
+        const appUrl = process.env.APP_URL || 'http://localhost:5000';
+        const redirectUri = `${appUrl}/api/auth/google/callback`;
         
         const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
             code,
@@ -338,7 +340,9 @@ const googleCallback = async (req, res) => {
         
         const token = generateToken(user.id, user.phone, user.email);
         
-        res.redirect(`${process.env.APP_URL || 'http://localhost:5000'}/login?token=${token}&user=${encodeURIComponent(JSON.stringify({
+        // Redirection vers le frontend avec le token
+        const frontendUrl = process.env.FRONTEND_URL || appUrl;
+        res.redirect(`${frontendUrl}/login?token=${token}&user=${encodeURIComponent(JSON.stringify({
             id: user.id,
             email: user.email,
             fullName: user.full_name,
@@ -350,7 +354,8 @@ const googleCallback = async (req, res) => {
         
     } catch (error) {
         console.error('Google callback error:', error.response?.data || error.message);
-        res.redirect(`${process.env.APP_URL || 'http://localhost:5000'}/login?error=google_auth_failed`);
+        const appUrl = process.env.APP_URL || 'http://localhost:5000';
+        res.redirect(`${appUrl}/login?error=google_auth_failed`);
     }
 };
 
