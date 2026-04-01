@@ -1,5 +1,4 @@
-// Configuration API
-const API_URL = 'https://sama-marche.onrender.com/api';
+
 
 // Récupérer l'ID depuis l'URL
 const urlParams = new URLSearchParams(window.location.search);
