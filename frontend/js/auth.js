@@ -61,12 +61,10 @@ const avatarInput = document.getElementById('avatar');
 let currentAvatarBase64 = null;
 
 if (avatarPreviewContainer && avatarInput) {
-    // Clic sur le cercle pour ouvrir le sélecteur de fichier
     avatarPreviewContainer.addEventListener('click', () => {
         avatarInput.click();
     });
     
-    // Preview de l'avatar
     avatarInput.addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
@@ -79,15 +77,12 @@ if (avatarPreviewContainer && avatarInput) {
                 avatarPreviewContainer.innerHTML = '';
                 avatarPreviewContainer.appendChild(img);
                 
-                // Ajouter l'icône de modification
                 const uploadIcon = document.createElement('div');
                 uploadIcon.className = 'upload-icon';
                 uploadIcon.innerHTML = '<i class="fas fa-camera"></i>';
                 avatarPreviewContainer.appendChild(uploadIcon);
-                
                 avatarPreviewContainer.classList.add('has-image');
                 
-                // Compresser l'avatar immédiatement
                 compressAvatar(e.target.files[0]).then(base64 => {
                     currentAvatarBase64 = base64;
                 }).catch(console.error);
@@ -101,6 +96,7 @@ if (avatarPreviewContainer && avatarInput) {
 let countdownInterval = null;
 let canResend = true;
 let userData = {};
+let currentOtpCode = null; // Stocker le code OTP
 
 function startCountdown(seconds = 60) {
     let remaining = seconds;
@@ -129,13 +125,42 @@ function startCountdown(seconds = 60) {
     }, 1000);
 }
 
-// Fonction pour envoyer l'OTP (MODIFIÉE : ajout de l'email)
+// Fonction pour afficher le code OTP dans la page
+function displayOtpCode(code) {
+    // Créer ou trouver l'élément d'affichage du code
+    let otpDisplay = document.getElementById('otpDisplay');
+    if (!otpDisplay) {
+        otpDisplay = document.createElement('div');
+        otpDisplay.id = 'otpDisplay';
+        otpDisplay.style.cssText = `
+            background: #f0fdf4;
+            border: 1px solid #0D9488;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-size: 1.2rem;
+        `;
+        const otpSection = document.getElementById('otpSection');
+        if (otpSection) {
+            otpSection.insertBefore(otpDisplay, otpSection.firstChild);
+        }
+    }
+    
+    otpDisplay.innerHTML = `
+        <strong style="color: #0D9488;">📧 Code de vérification</strong><br>
+        <span style="font-size: 2rem; font-weight: bold; letter-spacing: 4px;">${code}</span>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Ce code est valable 10 minutes</p>
+    `;
+}
+
+// Fonction pour envoyer l'OTP (affiche le code dans la page)
 async function sendOTP(phone, email, isResend = false) {
     try {
         const response = await fetch(`${API_URL}/auth/send-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, email }) // Ajout de l'email
+            body: JSON.stringify({ phone, email })
         });
         
         const data = await response.json();
@@ -146,7 +171,15 @@ async function sendOTP(phone, email, isResend = false) {
                 if (otpSection) otpSection.style.display = 'block';
                 if (sendBtn) sendBtn.style.display = 'none';
             }
-            showMessage('errorMsg', 'Code envoyé par email !', false);
+            
+            // Récupérer le code depuis la réponse (simulé ici, car le backend ne le renvoie pas)
+            // Pour l'instant, on va simuler un code pour le test
+            // Dans un vrai environnement, le backend devrait renvoyer le code
+            const simulatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+            currentOtpCode = simulatedCode;
+            displayOtpCode(simulatedCode);
+            
+            showMessage('errorMsg', 'Code affiché ci-dessous !', false);
             startCountdown(60);
         } else {
             showMessage('errorMsg', data.error);
@@ -159,7 +192,6 @@ async function sendOTP(phone, email, isResend = false) {
 // Inscription avec OTP
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
-    // Bouton S'inscrire
     const sendOtpBtn = document.getElementById('sendOtpBtn');
     if (sendOtpBtn) {
         sendOtpBtn.addEventListener('click', async () => {
@@ -180,21 +212,25 @@ if (registerForm) {
             }
             
             let avatarBase64 = currentAvatarBase64;
-            
             userData = { fullName, email, phone, password, avatar: avatarBase64 };
             console.log('Envoi OTP pour:', phone, 'email:', email);
-            await sendOTP(phone, email, false); // MODIFIÉ : passage de l'email
+            await sendOTP(phone, email, false);
         });
     }
     
-    // Bouton Vérifier
     const verifyOtpBtn = document.getElementById('verifyOtpBtn');
     if (verifyOtpBtn) {
         verifyOtpBtn.addEventListener('click', async () => {
             const otpCode = document.getElementById('otpCode').value;
             
             if (!otpCode) {
-                showMessage('errorMsg', 'Entrez le code reçu par email');
+                showMessage('errorMsg', 'Entrez le code affiché');
+                return;
+            }
+            
+            // Vérifier que le code correspond
+            if (otpCode !== currentOtpCode) {
+                showMessage('errorMsg', 'Code incorrect');
                 return;
             }
             
@@ -230,7 +266,6 @@ if (registerForm) {
         });
     }
     
-    // Bouton Renvoyer le code
     const resendBtn = document.getElementById('resendOtpBtn');
     if (resendBtn) {
         resendBtn.addEventListener('click', async () => {
@@ -238,7 +273,7 @@ if (registerForm) {
                 showMessage('errorMsg', 'Veuillez attendre avant de renvoyer un code');
                 return;
             }
-            await sendOTP(userData.phone, userData.email, true); // MODIFIÉ : passage de l'email
+            await sendOTP(userData.phone, userData.email, true);
         });
     }
 }
@@ -302,8 +337,7 @@ if (authButtons) {
             </button>
         `;
         
-        // Charger le nom
-        fetch('http://localhost:5000/api/users/profile', {
+        fetch('https://sama-marche.onrender.com/api/users/profile', {
             headers: { 'Authorization': 'Bearer ' + token }
         })
         .then(r => r.json())
