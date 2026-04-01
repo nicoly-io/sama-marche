@@ -53,7 +53,12 @@ const sendOTPCode = async (req, res) => {
             return res.status(500).json({ error: 'Erreur d\'envoi du code par email' });
         }
         
-        res.json({ success: true, message: 'Code envoyé par email' });
+        // Renvoyer le code OTP dans la réponse pour l'affichage dans la page
+        res.json({ 
+            success: true, 
+            message: 'Code envoyé par email',
+            otpCode: otpCode  // <-- AJOUT : renvoie le code
+        });
     } catch (error) {
         console.error('Send OTP error:', error);
         res.status(500).json({ error: 'Erreur serveur' });
@@ -263,7 +268,6 @@ const login = async (req, res) => {
 // Google Login - Redirection vers Google
 const googleLogin = (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    // Utiliser APP_URL depuis l'environnement
     const appUrl = process.env.APP_URL || 'http://localhost:5000';
     const redirectUri = `${appUrl}/api/auth/google/callback`;
     const scope = 'email profile';
@@ -340,7 +344,6 @@ const googleCallback = async (req, res) => {
         
         const token = generateToken(user.id, user.phone, user.email);
         
-        // Redirection vers le frontend avec le token
         const frontendUrl = process.env.FRONTEND_URL || appUrl;
         res.redirect(`${frontendUrl}/login?token=${token}&user=${encodeURIComponent(JSON.stringify({
             id: user.id,
