@@ -1,46 +1,77 @@
-// Service email (à configurer avec SendGrid, Brevo, ou autre)
+const sgMail = require('@sendgrid/mail');
+
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'noreply@sama-marche.onrender.com';
+const FROM_NAME = process.env.SENDGRID_FROM_NAME || 'Sama-Marche';
+
+// Configuration SendGrid
+if (SENDGRID_API_KEY) {
+    sgMail.setApiKey(SENDGRID_API_KEY);
+    console.log('✅ SendGrid configuré avec succès');
+} else {
+    console.warn('⚠️ SENDGRID_API_KEY non configuré - les emails ne seront pas envoyés');
+}
+
+// Envoyer un email
 const sendEmail = async (to, subject, htmlContent) => {
     try {
-        // TODO: Intégrer l'API email réelle
-        console.log(`[EMAIL SIMULATION] À: ${to}, Sujet: ${subject}`);
-        console.log(`Contenu: ${htmlContent.substring(0, 100)}...`);
+        // Si SendGrid n'est pas configuré, passer en simulation
+        if (!SENDGRID_API_KEY) {
+            console.log(`[EMAIL SIMULATION] À: ${to}, Sujet: ${subject}`);
+            console.log(`Contenu: ${htmlContent.substring(0, 100)}...`);
+            return { success: true, simulation: true };
+        }
         
-        // Exemple avec Brevo (Sendinblue)
-        /*
-        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': process.env.BREVO_API_KEY
-            },
-            body: JSON.stringify({
-                sender: { email: 'noreply@sama-marche.sn', name: 'Sama-Marche' },
-                to: [{ email: to }],
-                subject: subject,
-                htmlContent: htmlContent
-            })
-        });
+        const msg = {
+            to: to,
+            from: { email: FROM_EMAIL, name: FROM_NAME },
+            subject: subject,
+            html: htmlContent
+        };
         
-        if (!response.ok) throw new Error('Email sending failed');
-        */
-        
+        const response = await sgMail.send(msg);
+        console.log(`📧 Email envoyé à ${to} - Status: ${response[0].statusCode}`);
         return { success: true };
+        
     } catch (error) {
-        console.error('Email error:', error);
+        console.error('❌ Erreur envoi email:', error.response?.body || error.message);
         return { success: false, error: error.message };
     }
 };
 
+// Envoyer le code OTP
 const sendValidationCodeEmail = async (email, code) => {
     const html = `
-        <h1>Bienvenue sur Sama-Marche</h1>
-        <p>Votre code de vérification est : <strong>${code}</strong></p>
-        <p>Ce code est valable 10 minutes.</p>
-        <p>Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; background: #f5f7fb; padding: 20px; }
+                .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+                .logo { color: #0D9488; font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; }
+                .code { font-size: 32px; font-weight: bold; color: #0D9488; text-align: center; padding: 20px; background: #f0fdf4; border-radius: 12px; margin: 20px 0; letter-spacing: 5px; }
+                .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="logo">Sama-Marche</div>
+                <p>Bonjour,</p>
+                <p>Votre code de vérification est :</p>
+                <div class="code">${code}</div>
+                <p>Ce code est valable <strong>10 minutes</strong>.</p>
+                <p>Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
+                <div class="footer">
+                    &copy; 2026 Sama-Marche - La place de marché sécurisée du Sénégal
+                </div>
+            </div>
+        </body>
+        </html>
     `;
     return sendEmail(email, 'Code de vérification Sama-Marche', html);
 };
 
+// Confirmation de paiement
 const sendPaymentConfirmation = async (email, listingTitle, amount) => {
     const html = `
         <h1>Paiement confirmé</h1>
@@ -50,6 +81,7 @@ const sendPaymentConfirmation = async (email, listingTitle, amount) => {
     return sendEmail(email, 'Paiement confirmé - Sama-Marche', html);
 };
 
+// Code de livraison
 const sendDeliveryCode = async (email, code) => {
     const html = `
         <h1>Code de livraison</h1>
