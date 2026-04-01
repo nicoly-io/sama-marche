@@ -3,7 +3,7 @@ const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { s3Client, BUCKET_NAME } = require('../config/cloudflare');
 
 // Configuration : utiliser l'URL publique si disponible, sinon URLs signées
-const USE_PUBLIC_URL = false; // Mettre à true si le bucket est public
+const USE_PUBLIC_URL = true; // Mettre à true si le bucket est public
 
 // URL publique du bucket (à définir dans .env)
 const PUBLIC_URL = process.env.CLOUDFLARE_R2_PUBLIC_URL || '';
