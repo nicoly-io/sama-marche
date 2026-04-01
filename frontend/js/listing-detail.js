@@ -108,13 +108,25 @@ function displayListing() {
 
 // Configurer les boutons
 function setupButtons() {
+    console.log('=== setupButtons ===');
+    
+    // Vérifier si les boutons existent dans le DOM
+    const buyBtn = document.getElementById('buyNowBtn');
+    const contactBtn = document.getElementById('contactSellerBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const reportBtn = document.getElementById('reportBtn');
+    
+    console.log('buyNowBtn trouvé:', !!buyBtn);
+    console.log('contactSellerBtn trouvé:', !!contactBtn);
+    console.log('shareBtn trouvé:', !!shareBtn);
+    console.log('reportBtn trouvé:', !!reportBtn);
+    
     const isOwner = (currentUserId && currentListing.user_id === currentUserId);
     console.log('Est propriétaire:', isOwner);
     console.log('currentUserId:', currentUserId);
     console.log('listing.user_id:', currentListing.user_id);
     
     // Bouton Acheter
-    const buyBtn = document.getElementById('buyNowBtn');
     if (buyBtn) {
         if (isOwner) {
             buyBtn.style.display = 'none';
@@ -133,10 +145,11 @@ function setupButtons() {
             };
             console.log('Bouton acheter configuré');
         }
+    } else {
+        console.error('❌ buyNowBtn introuvable dans le DOM');
     }
     
     // Bouton Contacter
-    const contactBtn = document.getElementById('contactSellerBtn');
     if (contactBtn) {
         if (isOwner) {
             contactBtn.style.display = 'none';
@@ -155,10 +168,11 @@ function setupButtons() {
             };
             console.log('Bouton contacter configuré');
         }
+    } else {
+        console.error('❌ contactSellerBtn introuvable dans le DOM');
     }
     
     // Bouton Partager
-    const shareBtn = document.getElementById('shareBtn');
     if (shareBtn) {
         shareBtn.onclick = function(e) {
             e.preventDefault();
@@ -174,39 +188,48 @@ function setupButtons() {
             }
             return false;
         };
+        console.log('Bouton partager configuré');
+    } else {
+        console.error('❌ shareBtn introuvable dans le DOM');
     }
     
     // Bouton Signaler
-    const reportBtn = document.getElementById('reportBtn');
-    const reportModal = document.getElementById('reportModal');
-    if (reportBtn && reportModal) {
-        reportBtn.onclick = function(e) {
-            e.preventDefault();
-            console.log('Clic sur Signaler');
-            reportModal.style.display = 'flex';
-            return false;
-        };
-        
-        const closeBtns = document.querySelectorAll('.close-modal, #cancelReportBtn');
-        closeBtns.forEach(btn => {
-            btn.onclick = function() {
-                reportModal.style.display = 'none';
+    if (reportBtn) {
+        const reportModal = document.getElementById('reportModal');
+        if (reportModal) {
+            reportBtn.onclick = function(e) {
+                e.preventDefault();
+                console.log('Clic sur Signaler');
+                reportModal.style.display = 'flex';
+                return false;
             };
-        });
-        
-        const submitBtn = document.getElementById('submitReportBtn');
-        if (submitBtn) {
-            submitBtn.onclick = function() {
-                alert('Signalement envoyé. Merci !');
-                reportModal.style.display = 'none';
-            };
-        }
-        
-        window.onclick = function(event) {
-            if (event.target === reportModal) {
-                reportModal.style.display = 'none';
+            
+            const closeBtns = document.querySelectorAll('.close-modal, #cancelReportBtn');
+            closeBtns.forEach(btn => {
+                btn.onclick = function() {
+                    reportModal.style.display = 'none';
+                };
+            });
+            
+            const submitBtn = document.getElementById('submitReportBtn');
+            if (submitBtn) {
+                submitBtn.onclick = function() {
+                    alert('Signalement envoyé. Merci !');
+                    reportModal.style.display = 'none';
+                };
             }
-        };
+            
+            window.onclick = function(event) {
+                if (event.target === reportModal) {
+                    reportModal.style.display = 'none';
+                }
+            };
+            console.log('Bouton signaler configuré');
+        } else {
+            console.error('❌ reportModal introuvable');
+        }
+    } else {
+        console.error('❌ reportBtn introuvable dans le DOM');
     }
 }
 
