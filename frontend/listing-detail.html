@@ -245,9 +245,10 @@
     <script src="js/app.js"></script>
     <script src="js/listing-detail.js"></script>
     <script>
-        // Charger le nombre de messages non lus - RENOMMÉ en authToken
-        const authToken = localStorage.getItem('token');
-        if (authToken) {
+        // NE PAS redéclarer authToken ici car déjà dans listing-detail.js
+        
+        // Charger le nombre de messages non lus
+        if (typeof authToken !== 'undefined' && authToken) {
             fetch('https://sama-marche.onrender.com/api/chat/conversations', {
                 headers: { 'Authorization': 'Bearer ' + authToken }
             })
@@ -269,7 +270,7 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const loginBtn = document.getElementById('loginBtn');
         
-        if (authToken) {
+        if (typeof authToken !== 'undefined' && authToken) {
             if (logoutBtn) logoutBtn.style.display = 'inline-flex';
             if (loginBtn) loginBtn.style.display = 'none';
         } else {
