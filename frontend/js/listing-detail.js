@@ -1,3 +1,6 @@
+// Configuration API
+const API_URL = 'https://sama-marche.onrender.com/api';
+
 // Récupérer l'ID depuis l'URL
 const urlParams = new URLSearchParams(window.location.search);
 const listingId = urlParams.get('id');
@@ -11,7 +14,7 @@ let currentListing = null;
 let currentUserId = null;
 
 // Récupérer le token et l'utilisateur
-const token = localStorage.getItem('token');
+const authToken = localStorage.getItem('token'); // Renommé pour éviter conflit
 try {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -29,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Charger l'annonce
 async function loadListing() {
     try {
-        const response = await fetch(`http://localhost:5000/api/listings/${listingId}`);
+        const response = await fetch(`${API_URL}/listings/${listingId}`);
         const data = await response.json();
         currentListing = data.listing;
         
@@ -104,7 +107,7 @@ function setupButtons() {
             buyBtn.style.display = 'block';
             buyBtn.onclick = function(e) {
                 e.preventDefault();
-                if (!token) {
+                if (!authToken) {
                     window.location.href = `login.html?redirect=checkout.html?id=${listingId}`;
                 } else {
                     window.location.href = `checkout.html?id=${listingId}`;
@@ -114,7 +117,7 @@ function setupButtons() {
         }
     }
     
-    // Bouton Contacter (MODIFICATION ICI)
+    // Bouton Contacter
     const contactBtn = document.getElementById('contactSellerBtn');
     if (contactBtn) {
         if (isOwner) {
@@ -123,10 +126,9 @@ function setupButtons() {
             contactBtn.style.display = 'block';
             contactBtn.onclick = function(e) {
                 e.preventDefault();
-                if (!token) {
+                if (!authToken) {
                     window.location.href = `login.html?redirect=listing-detail.html?id=${listingId}`;
                 } else {
-                    // Redirection vers le chat avec l'ID de l'annonce
                     window.location.href = `chat.html?listing=${listingId}`;
                 }
                 return false;
@@ -185,23 +187,23 @@ function setupButtons() {
 
 // Gérer l'affichage des boutons de connexion
 function setupAuthButtons() {
-    const token = localStorage.getItem('token');
     const logoutBtn = document.getElementById('logoutBtn');
     const loginBtn = document.getElementById('loginBtn');
     
-    if (token) {
+    if (authToken) {
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
         if (loginBtn) loginBtn.style.display = 'none';
         
-        fetch('http://localhost:5000/api/users/profile', {
-            headers: { 'Authorization': 'Bearer ' + token }
+        fetch(`${API_URL}/users/profile`, {
+            headers: { 'Authorization': 'Bearer ' + authToken }
         })
         .then(r => r.json())
         .then(data => {
             if (data.user && document.getElementById('userName')) {
                 document.getElementById('userName').textContent = data.user.full_name || data.user.email;
             }
-        });
+        })
+        .catch(console.error);
     } else {
         if (logoutBtn) logoutBtn.style.display = 'none';
         if (loginBtn) loginBtn.style.display = 'inline-block';
