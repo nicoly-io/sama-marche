@@ -172,12 +172,16 @@ async function sendOTP(phone, email, isResend = false) {
                 if (sendBtn) sendBtn.style.display = 'none';
             }
             
-            // Récupérer le code depuis la réponse (simulé ici, car le backend ne le renvoie pas)
-            // Pour l'instant, on va simuler un code pour le test
-            // Dans un vrai environnement, le backend devrait renvoyer le code
-            const simulatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-            currentOtpCode = simulatedCode;
-            displayOtpCode(simulatedCode);
+            // Récupérer le code depuis la réponse du backend
+            if (data.otpCode) {
+                currentOtpCode = data.otpCode;
+                displayOtpCode(data.otpCode);
+            } else {
+                // Fallback: code aléatoire si le backend ne renvoie pas le code
+                const fallbackCode = Math.floor(100000 + Math.random() * 900000).toString();
+                currentOtpCode = fallbackCode;
+                displayOtpCode(fallbackCode);
+            }
             
             showMessage('errorMsg', 'Code affiché ci-dessous !', false);
             startCountdown(60);
