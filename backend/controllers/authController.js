@@ -284,7 +284,7 @@ const googleCallback = async (req, res) => {
         
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-        const redirectUri = `${process.env.APP_URL || 'http://localhost:5000'}/api/auth/google/callback`;
+        const redirectUri = `${process.env.APP_URL || 'https://sama-marche.onrender.com'}/api/auth/google/callback`;
         
         const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
             code,
