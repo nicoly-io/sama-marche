@@ -1,5 +1,5 @@
 // Configuration API
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://sama-marche.onrender.com/api';
 
 // Stockage du token JWT
 let authToken = localStorage.getItem('token');
