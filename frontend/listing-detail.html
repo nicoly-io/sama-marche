@@ -1,209 +1,281 @@
-// Récupérer l'ID depuis l'URL
-const urlParams = new URLSearchParams(window.location.search);
-const listingId = urlParams.get('id');
-
-if (!listingId) {
-    window.location.href = 'index.html';
-}
-
-// Variables globales
-let currentListing = null;
-let currentUserId = null;
-
-// Récupérer le token et l'utilisateur
-const authToken = localStorage.getItem('token');
-try {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-        const user = JSON.parse(storedUser);
-        currentUserId = user.id;
-    }
-} catch(e) {}
-
-// API_URL est définie dans app.js, ne pas la redéclarer
-
-// Attendre que le DOM soit prêt
-document.addEventListener('DOMContentLoaded', function() {
-    loadListing();
-    setupAuthButtons();
-});
-
-// Charger l'annonce
-async function loadListing() {
-    try {
-        const response = await fetch(`${API_URL}/listings/${listingId}`);
-        const data = await response.json();
-        currentListing = data.listing;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail annonce - Sama-Marche</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Styles pour le header amélioré */
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
         
-        displayListing();
-        setupButtons();
-    } catch (error) {
-        console.error('Erreur:', error);
-        document.querySelector('main').innerHTML = '<div class="text-center" style="padding: 3rem;">Erreur de chargement</div>';
-    }
-}
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-nav i {
+            font-size: 1rem;
+        }
+        
+        .btn-nav-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .btn-nav-outline:hover {
+            background: var(--gray-100);
+            transform: translateY(-2px);
+        }
+        
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
+        }
+        
+        .btn-nav-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+        
+        .btn-nav-icon {
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .btn-nav-icon:hover {
+            background: var(--gray-100);
+            transform: scale(1.05);
+        }
+        
+        .btn-relative {
+            position: relative;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            display: none;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        /* Style pour le bouton thème */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--gray-200);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-buttons {
+                gap: 0.5rem;
+            }
+            
+            .btn-nav {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
 
-// Afficher l'annonce
-function displayListing() {
-    const price = currentListing.buyer_price;
-    const formattedPrice = new Intl.NumberFormat('fr-SN').format(price) + ' FCFA';
-    
-    document.getElementById('listingTitle').textContent = currentListing.title;
-    document.getElementById('listingDescription').textContent = currentListing.description || 'Aucune description';
-    document.getElementById('listingPrice').textContent = formattedPrice;
-    document.getElementById('buyerPrice').textContent = formattedPrice;
-    document.getElementById('listingLocation').textContent = currentListing.quartier || 'Non spécifié';
-    document.getElementById('listingDate').textContent = new Date(currentListing.created_at).toLocaleDateString();
-    document.getElementById('listingViews').textContent = currentListing.views_count || 0;
-    document.getElementById('sellerName').textContent = currentListing.user?.full_name || 'Anonyme';
-    
-    if (currentListing.user?.avatar_url && currentListing.user.avatar_url !== 'null') {
-        const sellerAvatar = document.getElementById('sellerAvatar');
-        sellerAvatar.src = currentListing.user.avatar_url;
-        sellerAvatar.style.display = 'block';
-    }
-    
-    if (currentListing.user?.badge_visible) {
-        document.getElementById('sellerBadges').innerHTML = '<span class="listing-badge badge-verified">✓ Identité vérifiée</span>';
-    }
-    if (currentListing.is_boosted) {
-        document.getElementById('badges').innerHTML = '<span class="listing-badge badge-boost">⚡ Boosté</span>';
-    }
-    
-    if (currentListing.photos && currentListing.photos.length > 0) {
-        document.getElementById('mainPhoto').src = currentListing.photos[0].url;
-        const thumbnails = document.getElementById('thumbnails');
-        thumbnails.innerHTML = '';
-        currentListing.photos.forEach((photo, i) => {
-            const img = document.createElement('img');
-            img.src = photo.url;
-            img.style.width = '60px';
-            img.style.height = '60px';
-            img.style.objectFit = 'cover';
-            img.style.borderRadius = '8px';
-            img.style.cursor = 'pointer';
-            img.style.marginRight = '5px';
-            img.style.border = i === 0 ? '2px solid #0D9488' : '1px solid #ccc';
-            img.onclick = () => {
-                document.getElementById('mainPhoto').src = photo.url;
-                document.querySelectorAll('#thumbnails img').forEach(x => x.style.border = '1px solid #ccc');
-                img.style.border = '2px solid #0D9488';
-            };
-            thumbnails.appendChild(img);
-        });
-    }
-}
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sama-<span>Marche</span></a>
+                <div class="header-buttons">
+                    <a href="chat.html" class="btn-nav btn-nav-outline btn-relative">
+                        <i class="fas fa-comment-dots"></i> Messages
+                        <span id="unreadBadge" class="unread-badge">0</span>
+                    </a>
+                    <button id="logoutBtn" class="btn-nav btn-nav-outline" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                    <button id="themeToggle" class="btn-nav-icon" title="Mode sombre/clair">🌙</button>
+                    <a href="login.html" id="loginBtn" class="btn-nav btn-nav-outline">
+                        <i class="fas fa-sign-in-alt"></i> Connexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
 
-// Configurer les boutons
-function setupButtons() {
-    const isOwner = (currentUserId && currentListing.user_id === currentUserId);
-    
-    const buyBtn = document.getElementById('buyNowBtn');
-    if (buyBtn) {
-        if (isOwner) {
-            buyBtn.style.display = 'none';
-        } else {
-            buyBtn.style.display = 'block';
-            buyBtn.onclick = function(e) {
-                e.preventDefault();
-                if (!authToken) {
-                    window.location.href = `login.html?redirect=checkout.html?id=${listingId}`;
-                } else {
-                    window.location.href = `checkout.html?id=${listingId}`;
+    <main class="container" style="padding: 2rem 0;">
+        <div class="grid" style="grid-template-columns: 1fr 350px; gap: 2rem;">
+            <!-- Colonne gauche -->
+            <div>
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <img id="mainPhoto" src="assets/images/no-image.jpg" style="width: 100%; height: 400px; object-fit: cover; border-radius: 12px 12px 0 0;">
+                    <div id="thumbnails" class="flex gap-2" style="padding: 0.5rem; overflow-x: auto;"></div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h1 id="listingTitle">Chargement...</h1>
+                        <div class="flex items-center gap-2" style="margin: 0.5rem 0;"><div id="badges"></div></div>
+                        <div id="listingPrice" class="text-2xl font-bold text-primary" style="margin: 1rem 0;"></div>
+                        <div id="listingDescription" class="text-gray-700" style="margin: 1rem 0;"></div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <span><i class="fas fa-map-marker-alt"></i> <span id="listingLocation"></span></span>
+                            <span><i class="fas fa-calendar-alt"></i> <span id="listingDate"></span></span>
+                            <span><i class="fas fa-eye"></i> <span id="listingViews"></span> vues</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne droite -->
+            <div>
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-header"><h4><i class="fas fa-user"></i> Vendeur</h4></div>
+                    <div class="card-body">
+                        <div class="flex items-center gap-2">
+                            <img id="sellerAvatar" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #e5e7eb; display: none;">
+                            <div>
+                                <strong id="sellerName">Chargement...</strong>
+                                <div id="sellerBadges"></div>
+                            </div>
+                        </div>
+                        <button id="contactSellerBtn" class="btn btn-outline btn-block" style="margin-top: 1rem;">
+                            <i class="fas fa-comment"></i> Contacter le vendeur
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card" style="background: var(--primary); color: white;">
+                    <div class="card-body">
+                        <div style="font-size: 2rem; font-weight: bold;" id="buyerPrice"></div>
+                        <p class="text-sm" style="opacity: 0.8;"><i class="fas fa-shield-alt"></i> Prix final (frais inclus)</p>
+                        <button id="buyNowBtn" class="btn btn-secondary btn-block" style="margin-top: 1rem; background: white; color: var(--primary);">
+                            <i class="fas fa-lock"></i> Acheter avec Garantie
+                        </button>
+                        <p class="text-xs" style="margin-top: 0.5rem; opacity: 0.7;">
+                            <i class="fas fa-clock"></i> Paiement sécurisé • Argent bloqué jusqu'à livraison
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <div class="card-body">
+                        <div class="flex justify-center gap-3">
+                            <button id="shareBtn" class="btn btn-outline"><i class="fas fa-share-alt"></i> Partager</button>
+                            <button id="reportBtn" class="btn btn-outline"><i class="fas fa-flag"></i> Signaler</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-flag"></i> Signaler cette annonce</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Motif</label>
+                    <select id="reportReason" class="form-select">
+                        <option value="fraud">Arnaque / Fausse annonce</option>
+                        <option value="spam">Spam</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-pen"></i> Description</label>
+                    <textarea id="reportDescription" class="form-textarea" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelReportBtn" class="btn btn-outline"><i class="fas fa-times"></i> Annuler</button>
+                <button id="submitReportBtn" class="btn btn-danger"><i class="fas fa-paper-plane"></i> Envoyer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/listing-detail.js"></script>
+    <script>
+        // NE PAS redéclarer authToken ici car déjà dans listing-detail.js
+        
+        // Charger le nombre de messages non lus
+        if (typeof authToken !== 'undefined' && authToken) {
+            fetch('https://sama-marche.onrender.com/api/chat/conversations', {
+                headers: { 'Authorization': 'Bearer ' + authToken }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.conversations) {
+                    const totalUnread = data.conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+                    const badge = document.getElementById('unreadBadge');
+                    if (badge && totalUnread > 0) {
+                        badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                        badge.style.display = 'inline-block';
+                    }
                 }
-                return false;
-            };
+            })
+            .catch(console.error);
         }
-    }
-    
-    const contactBtn = document.getElementById('contactSellerBtn');
-    if (contactBtn) {
-        if (isOwner) {
-            contactBtn.style.display = 'none';
+        
+        // Gestion de l'affichage des boutons de connexion/déconnexion
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        
+        if (typeof authToken !== 'undefined' && authToken) {
+            if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+            if (loginBtn) loginBtn.style.display = 'none';
         } else {
-            contactBtn.style.display = 'block';
-            contactBtn.onclick = function(e) {
-                e.preventDefault();
-                if (!authToken) {
-                    window.location.href = `login.html?redirect=listing-detail.html?id=${listingId}`;
-                } else {
-                    window.location.href = `chat.html?listing=${listingId}`;
-                }
-                return false;
-            };
-        }
-    }
-    
-    const shareBtn = document.getElementById('shareBtn');
-    if (shareBtn) {
-        shareBtn.onclick = function(e) {
-            e.preventDefault();
-            if (navigator.share) {
-                navigator.share({
-                    title: currentListing.title,
-                    url: window.location.href
-                });
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Lien copié !');
-            }
-            return false;
-        };
-    }
-    
-    const reportBtn = document.getElementById('reportBtn');
-    const reportModal = document.getElementById('reportModal');
-    if (reportBtn && reportModal) {
-        reportBtn.onclick = function(e) {
-            e.preventDefault();
-            reportModal.style.display = 'flex';
-            return false;
-        };
-        
-        const closeBtns = document.querySelectorAll('.close-modal, #cancelReportBtn');
-        closeBtns.forEach(btn => {
-            btn.onclick = function() {
-                reportModal.style.display = 'none';
-            };
-        });
-        
-        const submitBtn = document.getElementById('submitReportBtn');
-        if (submitBtn) {
-            submitBtn.onclick = function() {
-                alert('Signalement envoyé. Merci !');
-                reportModal.style.display = 'none';
-            };
-        }
-        
-        window.onclick = function(event) {
-            if (event.target === reportModal) {
-                reportModal.style.display = 'none';
-            }
-        };
-    }
-}
-
-// Gérer l'affichage des boutons de connexion
-function setupAuthButtons() {
-    const logoutBtn = document.getElementById('logoutBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    
-    if (authToken) {
-        if (logoutBtn) logoutBtn.style.display = 'inline-block';
-        if (loginBtn) loginBtn.style.display = 'none';
-        
-        fetch(`${API_URL}/users/profile`, {
-            headers: { 'Authorization': 'Bearer ' + authToken }
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.user && document.getElementById('userName')) {
-                document.getElementById('userName').textContent = data.user.full_name || data.user.email;
-            }
-        })
-        .catch(console.error);
-    } else {
-        if (logoutBtn) logoutBtn.style.display = 'none';
-        if (loginBtn) loginBtn.style.display = 'inline-block';
-    }
-}
+            if (logoutBtn) logoutBtn.style.display = 'none';
+            if (loginBtn) loginBtn.style.display = 'inline-flex';
+        } </script>
+</body>
+</html>
