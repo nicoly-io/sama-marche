@@ -1,3 +1,6 @@
+// Configuration API
+const API_URL = 'https://sama-marche.onrender.com/api';
+
 const urlParams = new URLSearchParams(window.location.search);
 const listingId = urlParams.get('listing');
 const conversationIdParam = urlParams.get('conversation');
@@ -5,7 +8,7 @@ const conversationIdParam = urlParams.get('conversation');
 let currentConversationId = null;
 let currentUserId = null;
 
-const token = localStorage.getItem('token');
+const authToken = localStorage.getItem('token');
 try {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -17,7 +20,7 @@ try {
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM chargé');
     
-    if (!token) {
+    if (!authToken) {
         window.location.href = 'login.html';
         return;
     }
@@ -38,8 +41,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function createOrGetConversationByListing(listingId) {
     try {
-        const response = await fetch(`http://localhost:5000/api/chat/conversation/${listingId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        const response = await fetch(`${API_URL}/chat/conversation/${listingId}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
         const data = await response.json();
         
@@ -65,8 +68,8 @@ async function createOrGetConversationByListing(listingId) {
 
 async function loadConversations() {
     try {
-        const response = await fetch('http://localhost:5000/api/chat/conversations', {
-            headers: { 'Authorization': `Bearer ${token}` }
+        const response = await fetch(`${API_URL}/chat/conversations`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
         const data = await response.json();
         
@@ -125,8 +128,8 @@ function highlightConversation(convId) {
 
 async function loadMessages(conversationId) {
     try {
-        const response = await fetch(`http://localhost:5000/api/chat/messages/${conversationId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        const response = await fetch(`${API_URL}/chat/messages/${conversationId}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
         const data = await response.json();
         
@@ -180,17 +183,16 @@ async function sendMessage() {
         return;
     }
     
-    // Désactiver temporairement le bouton pour éviter les doublons
     const sendBtn = document.getElementById('sendBtn');
     sendBtn.disabled = true;
     sendBtn.style.opacity = '0.6';
     
     try {
-        const response = await fetch(`http://localhost:5000/api/chat/message/${currentConversationId}`, {
+        const response = await fetch(`${API_URL}/chat/message/${currentConversationId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${authToken}`
             },
             body: JSON.stringify({ message: message })
         });
@@ -201,7 +203,6 @@ async function sendMessage() {
             input.value = '';
             await loadMessages(currentConversationId);
             await loadUnreadCount();
-            // Recharger les conversations pour mettre à jour le dernier message
             await loadConversations();
         } else {
             alert(data.error || 'Erreur lors de l\'envoi');
@@ -218,15 +219,14 @@ async function sendMessage() {
 
 async function markAsRead(conversationId) {
     try {
-        await fetch(`http://localhost:5000/api/chat/mark-read/${conversationId}`, {
+        await fetch(`${API_URL}/chat/mark-read/${conversationId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${authToken}`
             }
         });
         await loadUnreadCount();
-        // Recharger les conversations pour mettre à jour le badge
         await loadConversations();
     } catch (error) {
         console.error('Erreur mark as read:', error);
@@ -257,14 +257,12 @@ function setupActionButtons() {
     
     if (attachBtn) {
         attachBtn.addEventListener('click', () => {
-            // Fonctionnalité à venir: ajout de pièces jointes
             alert('Fonctionnalité à venir : Ajout de pièces jointes');
         });
     }
     
     if (emojiBtn) {
         emojiBtn.addEventListener('click', () => {
-            // Fonctionnalité à venir: sélecteur d'emojis
             alert('Fonctionnalité à venir : Sélecteur d\'emojis');
         });
     }
@@ -286,9 +284,9 @@ if (logoutBtn) {
     });
 }
 
-if (token) {
-    fetch('http://localhost:5000/api/users/profile', {
-        headers: { 'Authorization': 'Bearer ' + token }
+if (authToken) {
+    fetch(`${API_URL}/users/profile`, {
+        headers: { 'Authorization': 'Bearer ' + authToken }
     })
     .then(r => r.json())
     .then(data => {
