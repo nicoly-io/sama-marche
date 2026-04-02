@@ -8,19 +8,19 @@ const { LISTING_STATUS, DEFAULT_LIMITS } = require('../utils/constants');
 const { logSecurityEvent } = require('../middleware/security');
 
 // Créer une annonce
-// Créer une annonce
 const createListing = async (req, res) => {
-    // Upload des photos (middleware qui traite le formulaire)
     uploadListingPhotos(req, res, async (err) => {
         if (err) {
-            console.error('Upload error:', err);
+            console.error('❌ Upload error:', err);
             return res.status(400).json({ error: err.message });
         }
         
         console.log('=== CREATE LISTING ===');
-        console.log('User:', req.user);
-        console.log('Body:', req.body);
-        console.log('Files:', req.files);
+        console.log('📸 Fichiers reçus:', req.files ? req.files.length : 0);
+        if (req.files && req.files.length > 0) {
+            console.log('📸 Premier fichier:', req.files[0].path, req.files[0].size);
+        }
+        console.log('📝 Body:', req.body);
         
         try {
             const userId = req.user.id;
@@ -53,8 +53,6 @@ const createListing = async (req, res) => {
             const quartier = req.body.quartier;
             const ville = req.body.ville;
             
-            console.log('Parsed data:', { title, description, seller_price, quartier });
-            
             // Validation
             const errors = validateListingData({ title, seller_price, quartier });
             if (errors.length > 0) {
@@ -86,13 +84,16 @@ const createListing = async (req, res) => {
                 .single();
             
             if (error) {
-                console.error('Supabase insert error:', error);
+                console.error('❌ Supabase insert error:', error);
                 return res.status(500).json({ error: 'Erreur lors de la création de l\'annonce' });
             }
+            
+            console.log('✅ Annonce créée avec ID:', listing.id);
             
             // Upload des photos vers R2
             const files = req.files;
             if (files && files.length > 0) {
+                console.log('📤 Upload de', files.length, 'photo(s) vers R2...');
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     try {
@@ -101,6 +102,7 @@ const createListing = async (req, res) => {
                         const uploadResult = await uploadFile(file.path, 'annonces', `${listing.id}_${i}_${Date.now()}.jpg`);
                         
                         if (uploadResult.success) {
+                            console.log('✅ Photo', i, 'uploadée avec succès, key:', uploadResult.key);
                             await supabase
                                 .from('listing_photos')
                                 .insert({
@@ -109,11 +111,15 @@ const createListing = async (req, res) => {
                                     order_index: i,
                                     is_primary: i === 0
                                 });
+                        } else {
+                            console.error('❌ Échec upload photo', i, ':', uploadResult.error);
                         }
                     } catch (uploadError) {
-                        console.error('Photo upload error:', uploadError);
+                        console.error('❌ Photo upload error:', uploadError);
                     }
                 }
+            } else {
+                console.log('⚠️ Aucun fichier reçu pour upload');
             }
             
             // Récupérer les photos
@@ -122,6 +128,8 @@ const createListing = async (req, res) => {
                 .select('*')
                 .eq('listing_id', listing.id)
                 .order('order_index');
+            
+            console.log('📸 Photos en base après upload:', photos ? photos.length : 0);
             
             await logSecurityEvent('LISTING_CREATED', userId, req, false, { listing_id: listing.id });
             
@@ -139,11 +147,12 @@ const createListing = async (req, res) => {
                 }
             });
         } catch (error) {
-            console.error('Create listing error:', error);
+            console.error('❌ Create listing error:', error);
             res.status(500).json({ error: 'Erreur lors de la création de l\'annonce: ' + error.message });
         }
     });
 };
+
 // Obtenir toutes les annonces (avec filtres)
 const getListings = async (req, res) => {
     try {
@@ -250,6 +259,8 @@ const getListingById = async (req, res) => {
         if (error || !listing) {
             return res.status(404).json({ error: 'Annonce non trouvée' });
         }
+        
+        console.log('📸 Listing brut photos:', listing.photos);
         
         // Incrémenter les vues
         await supabase
