@@ -15,7 +15,13 @@ router.get('/', generalLimiter, getListings);
 router.get('/:id', generalLimiter, getListingById);
 
 // Routes protégées
-router.post('/', authenticate, listingLimiter, createListing);
+router.post('/', authenticate, (req, res, next) => {
+    console.log('➡️ Route POST /api/listings atteinte');
+    console.log('📝 Headers:', req.headers);
+    console.log('👤 User:', req.user);
+    next();
+}, listingLimiter, createListing);
+
 router.put('/:id', authenticate, updateListing);
 router.delete('/:id', authenticate, deleteListing);
 
