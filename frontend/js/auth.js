@@ -55,7 +55,7 @@ async function compressAvatar(file) {
     });
 }
 
-// Gestion de la photo de profil (cercle avec icône)
+// Gestion de la photo de profil
 const avatarPreviewContainer = document.getElementById('avatarPreviewContainer');
 const avatarInput = document.getElementById('avatar');
 let currentAvatarBase64 = null;
@@ -147,44 +147,50 @@ function displayOtpCode(code) {
     }
     
     otpDisplay.innerHTML = `
-        <strong style="color: #0D9488;">📧 Code de vérification (TEST)</strong><br>
+        <strong style="color: #0D9488;">📧 Code de vérification</strong><br>
         <span style="font-size: 2rem; font-weight: bold; letter-spacing: 4px;">${code}</span>
         <p style="font-size: 0.8rem; margin-top: 0.5rem;">Ce code est valable 10 minutes</p>
     `;
 }
 
-// Fonction pour envoyer l'OTP - GÉNÈRE UN CODE DE TEST
+// Fonction pour envoyer l'OTP - UTILISE LE CODE DU BACKEND
 async function sendOTP(phone, email, isResend = false) {
     try {
-        // Générer un code de test à 6 chiffres
-        const testCode = Math.floor(100000 + Math.random() * 900000).toString();
-        currentOtpCode = testCode;
+        const response = await fetch(`${API_URL}/auth/send-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, email })
+        });
         
-        // Afficher le code dans la page
-        displayOtpCode(testCode);
+        const data = await response.json();
+        console.log('Réponse send-otp:', data);
         
-        if (!isResend) {
-            const otpSection = document.getElementById('otpSection');
-            const sendBtn = document.getElementById('sendOtpBtn');
-            if (otpSection) otpSection.style.display = 'block';
-            if (sendBtn) sendBtn.style.display = 'none';
+        if (response.ok) {
+            if (data.otpCode) {
+                currentOtpCode = data.otpCode;
+                displayOtpCode(data.otpCode);
+                console.log('Code reçu du backend:', data.otpCode);
+            } else {
+                const fallbackCode = Math.floor(100000 + Math.random() * 900000).toString();
+                currentOtpCode = fallbackCode;
+                displayOtpCode(fallbackCode);
+                console.log('Code fallback généré:', fallbackCode);
+            }
+            
+            if (!isResend) {
+                const otpSection = document.getElementById('otpSection');
+                const sendBtn = document.getElementById('sendOtpBtn');
+                if (otpSection) otpSection.style.display = 'block';
+                if (sendBtn) sendBtn.style.display = 'none';
+            }
+            
+            showMessage('errorMsg', 'Code affiché ci-dessous !', false);
+            startCountdown(60);
+        } else {
+            showMessage('errorMsg', data.error || 'Erreur lors de l\'envoi');
         }
-        
-        showMessage('errorMsg', 'Code de test affiché ci-dessous !', false);
-        startCountdown(60);
-        
-        // Appeler le backend pour enregistrer le code (optionnel)
-        try {
-            await fetch(`${API_URL}/auth/send-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, email, testCode })
-            });
-        } catch (e) {
-            console.log('Backend appelé, mais code affiché localmente');
-        }
-        
     } catch (error) {
+        console.error('Erreur sendOTP:', error);
         showMessage('errorMsg', 'Erreur d\'envoi du code');
     }
 }
@@ -224,24 +230,20 @@ if (registerForm) {
             const otpCode = document.getElementById('otpCode').value;
             
             console.log('=== VÉRIFICATION OTP ===');
-            console.log('Code entré par l\'utilisateur:', otpCode);
-            console.log('Code stocké (currentOtpCode):', currentOtpCode);
-            console.log('Types:', typeof otpCode, typeof currentOtpCode);
-            console.log('Longueurs:', otpCode?.length, currentOtpCode?.length);
+            console.log('Code entré:', otpCode);
+            console.log('Code attendu:', currentOtpCode);
             
             if (!otpCode) {
                 showMessage('errorMsg', 'Entrez le code affiché');
                 return;
             }
             
-            // Vérifier que le code correspond
             if (otpCode !== currentOtpCode) {
-                showMessage('errorMsg', `Code incorrect. Attendu: ${currentOtpCode}, Reçu: ${otpCode}`);
+                showMessage('errorMsg', 'Code incorrect');
                 return;
             }
             
-            console.log('✅ Code correct, envoi au backend...');
-            console.log('Vérification OTP, avatar présent:', userData.avatar ? 'Oui' : 'Non');
+            console.log('✅ Code correct');
             
             try {
                 const response = await fetch(`${API_URL}/auth/verify-otp`, {
@@ -258,7 +260,7 @@ if (registerForm) {
                 });
                 
                 const data = await response.json();
-                console.log('Réponse backend:', data);
+                console.log('Réponse verify:', data);
                 
                 if (response.ok) {
                     console.log('Inscription réussie');
