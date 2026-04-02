@@ -181,7 +181,7 @@ async function sendOTP(phone, email, isResend = false) {
                 body: JSON.stringify({ phone, email, testCode })
             });
         } catch (e) {
-            console.log('Backend appelé, mais code affiché localement');
+            console.log('Backend appelé, mais code affiché localmente');
         }
         
     } catch (error) {
@@ -223,6 +223,12 @@ if (registerForm) {
         verifyOtpBtn.addEventListener('click', async () => {
             const otpCode = document.getElementById('otpCode').value;
             
+            console.log('=== VÉRIFICATION OTP ===');
+            console.log('Code entré par l\'utilisateur:', otpCode);
+            console.log('Code stocké (currentOtpCode):', currentOtpCode);
+            console.log('Types:', typeof otpCode, typeof currentOtpCode);
+            console.log('Longueurs:', otpCode?.length, currentOtpCode?.length);
+            
             if (!otpCode) {
                 showMessage('errorMsg', 'Entrez le code affiché');
                 return;
@@ -230,10 +236,11 @@ if (registerForm) {
             
             // Vérifier que le code correspond
             if (otpCode !== currentOtpCode) {
-                showMessage('errorMsg', 'Code incorrect');
+                showMessage('errorMsg', `Code incorrect. Attendu: ${currentOtpCode}, Reçu: ${otpCode}`);
                 return;
             }
             
+            console.log('✅ Code correct, envoi au backend...');
             console.log('Vérification OTP, avatar présent:', userData.avatar ? 'Oui' : 'Non');
             
             try {
@@ -251,6 +258,8 @@ if (registerForm) {
                 });
                 
                 const data = await response.json();
+                console.log('Réponse backend:', data);
+                
                 if (response.ok) {
                     console.log('Inscription réussie');
                     localStorage.setItem('token', data.token);
