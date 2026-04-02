@@ -1,5 +1,4 @@
-// Configuration API
-const API_URL = 'https://sama-marche.onrender.com/api';
+// API_URL est déjà définie dans app.js, ne pas la redéclarer
 
 const urlParams = new URLSearchParams(window.location.search);
 const listingId = urlParams.get('listing');
