@@ -548,26 +548,5 @@
 
     <script src="js/app.js"></script>
     <script src="js/dashboard.js"></script>
-    <script>
-        // Charger le nombre de messages non lus
-        const token = localStorage.getItem('token');
-        if (token) {
-            fetch('http://localhost:5000/api/chat/conversations', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.conversations) {
-                    const totalUnread = data.conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
-                    const badge = document.getElementById('unreadBadge');
-                    if (badge && totalUnread > 0) {
-                        badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
-                        badge.style.display = 'inline-block';
-                    }
-                }
-            })
-            .catch(console.error);
-        }
-    </script>
 </body>
 </html>
