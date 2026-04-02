@@ -7,7 +7,7 @@ const conversationIdParam = urlParams.get('conversation');
 let currentConversationId = null;
 let currentUserId = null;
 
-const authToken = localStorage.getItem('token');
+const userToken = localStorage.getItem('token'); // Renommé pour éviter conflit
 try {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -19,7 +19,7 @@ try {
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM chargé');
     
-    if (!authToken) {
+    if (!userToken) {
         window.location.href = 'login.html';
         return;
     }
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function createOrGetConversationByListing(listingId) {
     try {
         const response = await fetch(`${API_URL}/chat/conversation/${listingId}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
+            headers: { 'Authorization': `Bearer ${userToken}` }
         });
         const data = await response.json();
         
@@ -68,7 +68,7 @@ async function createOrGetConversationByListing(listingId) {
 async function loadConversations() {
     try {
         const response = await fetch(`${API_URL}/chat/conversations`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
+            headers: { 'Authorization': `Bearer ${userToken}` }
         });
         const data = await response.json();
         
@@ -128,7 +128,7 @@ function highlightConversation(convId) {
 async function loadMessages(conversationId) {
     try {
         const response = await fetch(`${API_URL}/chat/messages/${conversationId}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
+            headers: { 'Authorization': `Bearer ${userToken}` }
         });
         const data = await response.json();
         
@@ -191,7 +191,7 @@ async function sendMessage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                'Authorization': `Bearer ${userToken}`
             },
             body: JSON.stringify({ message: message })
         });
@@ -222,7 +222,7 @@ async function markAsRead(conversationId) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                'Authorization': `Bearer ${userToken}`
             }
         });
         await loadUnreadCount();
@@ -283,9 +283,9 @@ if (logoutBtn) {
     });
 }
 
-if (authToken) {
+if (userToken) {
     fetch(`${API_URL}/users/profile`, {
-        headers: { 'Authorization': 'Bearer ' + authToken }
+        headers: { 'Authorization': 'Bearer ' + userToken }
     })
     .then(r => r.json())
     .then(data => {
