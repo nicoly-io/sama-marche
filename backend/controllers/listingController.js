@@ -1,177 +1,132 @@
 const supabase = require('../config/supabase');
-const { uploadListingPhotos } = require('../middleware/upload');
-const { uploadFile, getFileUrl, deleteFile } = require('../services/r2Service');
-const { compressAndSave } = require('../services/compressionService');
 const { calculateBuyerPrice, calculatePlatformFees } = require('../utils/helpers');
 const { validateListingData } = require('../utils/validators');
 const { LISTING_STATUS, DEFAULT_LIMITS } = require('../utils/constants');
 const { logSecurityEvent } = require('../middleware/security');
 
-// Créer une annonce
+// Créer une annonce (version base64 - solution de secours)
 const createListing = async (req, res) => {
-    console.log('🔍 [DEBUG] createListing appelée');
-    console.log('🔍 [DEBUG] req.files avant upload:', req.files);
-    
-    uploadListingPhotos(req, res, async (err) => {
-        if (err) {
-            console.error('❌ Upload error:', err);
-            return res.status(400).json({ error: err.message });
-        }
+    try {
+        console.log('=== CREATE LISTING (BASE64 MODE) ===');
         
-        console.log('=== CREATE LISTING ===');
-        console.log('📸 Fichiers reçus:', req.files ? req.files.length : 0);
-        if (req.files && req.files.length > 0) {
-            console.log('📸 Premier fichier:', req.files[0].path, req.files[0].size);
-        }
-        console.log('📝 Body:', req.body);
+        const userId = req.user.id;
         
-        try {
-            const userId = req.user.id;
-            
-            // Vérifier les limites pour les comptes gratuits
-            if (req.user.account_type === 'individual') {
-                const { count, error } = await supabase
-                    .from('listings')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('user_id', userId)
-                    .eq('status', LISTING_STATUS.ACTIVE);
-                
-                if (error) throw error;
-                
-                if (count >= DEFAULT_LIMITS.FREE_LISTINGS_MAX) {
-                    return res.status(403).json({ 
-                        error: `Vous avez atteint la limite de ${DEFAULT_LIMITS.FREE_LISTINGS_MAX} annonces actives.` 
-                    });
-                }
-            }
-            
-            // Récupérer les données du formulaire
-            const title = req.body.title;
-            const description = req.body.description;
-            const category = req.body.category;
-            const condition = req.body.condition;
-            const seller_price = req.body.seller_price;
-            const latitude = req.body.latitude;
-            const longitude = req.body.longitude;
-            const quartier = req.body.quartier;
-            const ville = req.body.ville;
-            
-            // Validation
-            const errors = validateListingData({ title, seller_price, quartier });
-            if (errors.length > 0) {
-                return res.status(400).json({ errors });
-            }
-            
-            const buyer_price = calculateBuyerPrice(parseInt(seller_price));
-            const platform_fee_total = calculatePlatformFees(parseInt(seller_price));
-            
-            // Créer l'annonce
-            const { data: listing, error } = await supabase
+        // Vérifier les limites
+        if (req.user.account_type === 'individual') {
+            const { count, error } = await supabase
                 .from('listings')
-                .insert({
-                    user_id: userId,
-                    title,
-                    description,
-                    category,
-                    condition,
-                    seller_price: parseInt(seller_price),
-                    buyer_price,
-                    platform_fee_total,
-                    latitude: latitude || null,
-                    longitude: longitude || null,
-                    quartier,
-                    ville: ville || 'Dakar',
-                    status: LISTING_STATUS.ACTIVE
-                })
-                .select()
-                .single();
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId)
+                .eq('status', LISTING_STATUS.ACTIVE);
             
-            if (error) {
-                console.error('❌ Supabase insert error:', error);
-                return res.status(500).json({ error: 'Erreur lors de la création de l\'annonce' });
+            if (error) throw error;
+            
+            if (count >= DEFAULT_LIMITS.FREE_LISTINGS_MAX) {
+                return res.status(403).json({ 
+                    error: `Vous avez atteint la limite de ${DEFAULT_LIMITS.FREE_LISTINGS_MAX} annonces actives.` 
+                });
             }
-            
-            console.log('✅ Annonce créée avec ID:', listing.id);
-            
-            // Upload des photos vers R2
-            const files = req.files;
-            if (files && files.length > 0) {
-                console.log('📤 Upload de', files.length, 'photo(s) vers R2...');
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    try {
-                        await compressAndSave(file.path, 1024, 80);
-                        
-                        const uploadResult = await uploadFile(file.path, 'annonces', `${listing.id}_${i}_${Date.now()}.jpg`);
-                        
-                        if (uploadResult.success) {
-                            console.log('✅ Photo', i, 'uploadée avec succès, key:', uploadResult.key);
-                            await supabase
-                                .from('listing_photos')
-                                .insert({
-                                    listing_id: listing.id,
-                                    storage_path: uploadResult.key,
-                                    order_index: i,
-                                    is_primary: i === 0
-                                });
-                        } else {
-                            console.error('❌ Échec upload photo', i, ':', uploadResult.error);
-                        }
-                    } catch (uploadError) {
-                        console.error('❌ Photo upload error:', uploadError);
-                    }
-                }
-            } else {
-                console.log('⚠️ Aucun fichier reçu pour upload');
-            }
-            
-            // Récupérer les photos
-            const { data: photos } = await supabase
-                .from('listing_photos')
-                .select('*')
-                .eq('listing_id', listing.id)
-                .order('order_index');
-            
-            console.log('📸 Photos en base après upload:', photos ? photos.length : 0);
-            
-            await logSecurityEvent('LISTING_CREATED', userId, req, false, { listing_id: listing.id });
-            
-            // Générer les URLs signées
-            const photosWithUrls = await Promise.all((photos || []).map(async (p) => ({
-                ...p,
-                url: p.storage_path ? await getFileUrl(p.storage_path) : null
-            })));
-            
-            res.json({
-                success: true,
-                listing: {
-                    ...listing,
-                    photos: photosWithUrls
-                }
-            });
-        } catch (error) {
-            console.error('❌ Create listing error:', error);
-            res.status(500).json({ error: 'Erreur lors de la création de l\'annonce: ' + error.message });
         }
-    });
+        
+        // Récupérer les données
+        const title = req.body.title;
+        const description = req.body.description;
+        const category = req.body.category;
+        const condition = req.body.condition;
+        const seller_price = req.body.seller_price;
+        const latitude = req.body.latitude;
+        const longitude = req.body.longitude;
+        const quartier = req.body.quartier;
+        const ville = req.body.ville;
+        
+        // Récupérer les photos base64
+        let photosBase64 = [];
+        if (req.body.photosBase64) {
+            try {
+                photosBase64 = JSON.parse(req.body.photosBase64);
+            } catch(e) {
+                photosBase64 = [];
+            }
+        }
+        
+        // Validation
+        const errors = validateListingData({ title, seller_price, quartier });
+        if (errors.length > 0) {
+            return res.status(400).json({ errors });
+        }
+        
+        const buyer_price = calculateBuyerPrice(parseInt(seller_price));
+        const platform_fee_total = calculatePlatformFees(parseInt(seller_price));
+        
+        // Créer l'annonce
+        const { data: listing, error } = await supabase
+            .from('listings')
+            .insert({
+                user_id: userId,
+                title,
+                description,
+                category,
+                condition,
+                seller_price: parseInt(seller_price),
+                buyer_price,
+                platform_fee_total,
+                latitude: latitude || null,
+                longitude: longitude || null,
+                quartier,
+                ville: ville || 'Dakar',
+                status: LISTING_STATUS.ACTIVE
+            })
+            .select()
+            .single();
+        
+        if (error) {
+            console.error('Supabase insert error:', error);
+            return res.status(500).json({ error: 'Erreur lors de la création' });
+        }
+        
+        console.log('✅ Annonce créée avec ID:', listing.id);
+        
+        // Stocker les photos en base64
+        if (photosBase64.length > 0) {
+            for (let i = 0; i < Math.min(photosBase64.length, 5); i++) {
+                await supabase
+                    .from('listing_photos')
+                    .insert({
+                        listing_id: listing.id,
+                        storage_path: photosBase64[i],
+                        order_index: i,
+                        is_primary: i === 0
+                    });
+            }
+            console.log(`✅ ${photosBase64.length} photo(s) stockées en base64`);
+        }
+        
+        // Récupérer les photos
+        const { data: photos } = await supabase
+            .from('listing_photos')
+            .select('*')
+            .eq('listing_id', listing.id)
+            .order('order_index');
+        
+        await logSecurityEvent('LISTING_CREATED', userId, req, false, { listing_id: listing.id });
+        
+        res.json({
+            success: true,
+            listing: {
+                ...listing,
+                photos: photos || []
+            }
+        });
+    } catch (error) {
+        console.error('Create listing error:', error);
+        res.status(500).json({ error: 'Erreur lors de la création: ' + error.message });
+    }
 };
 
-// Obtenir toutes les annonces (avec filtres)
+// Obtenir toutes les annonces
 const getListings = async (req, res) => {
     try {
-        const {
-            page = 1,
-            limit = 20,
-            category,
-            quartier,
-            minPrice,
-            maxPrice,
-            condition,
-            search,
-            lat,
-            lng,
-            sort = 'recent'
-        } = req.query;
+        const { page = 1, limit = 20, category, quartier, minPrice, maxPrice, search, sort = 'recent' } = req.query;
         
         let query = supabase
             .from('listings')
@@ -182,10 +137,8 @@ const getListings = async (req, res) => {
             `)
             .eq('status', LISTING_STATUS.ACTIVE);
         
-        // Filtres
         if (category) query = query.eq('category', category);
         if (quartier) query = query.eq('quartier', quartier);
-        if (condition) query = query.eq('condition', condition);
         if (minPrice) query = query.gte('buyer_price', parseInt(minPrice));
         if (maxPrice) query = query.lte('buyer_price', parseInt(maxPrice));
         
@@ -193,14 +146,8 @@ const getListings = async (req, res) => {
             query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
         }
         
-        if (lat && lng) {
-            query = query.not('latitude', 'is', null);
-        }
-        
-        // Tri
         if (sort === 'recent') {
             query = query.order('created_at', { ascending: false });
-            query = query.order('is_boosted', { ascending: false });
         } else if (sort === 'price_asc') {
             query = query.order('buyer_price', { ascending: true });
         } else if (sort === 'price_desc') {
@@ -210,42 +157,13 @@ const getListings = async (req, res) => {
         const from = (page - 1) * limit;
         const to = from + limit - 1;
         
-        const { data, error, count } = await supabase
-            .from('listings')
-            .select('*', { count: 'exact' })
-            .eq('status', LISTING_STATUS.ACTIVE)
-            .range(from, to);
+        const { data, error, count } = await query.range(from, to);
         
         if (error) throw error;
         
-        // Générer les URLs signées pour chaque photo
-        const listingsWithUrls = await Promise.all((data || []).map(async (listing) => {
-            const { data: photos } = await supabase
-                .from('listing_photos')
-                .select('storage_path, is_primary, order_index')
-                .eq('listing_id', listing.id);
-            
-            const photosWithUrls = await Promise.all((photos || []).map(async (p) => ({
-                ...p,
-                url: p.storage_path ? await getFileUrl(p.storage_path) : null
-            })));
-            
-            const { data: user } = await supabase
-                .from('users')
-                .select('id, full_name, badge_visible, is_cni_verified')
-                .eq('id', listing.user_id)
-                .single();
-            
-            return {
-                ...listing,
-                photos: photosWithUrls,
-                user: user
-            };
-        }));
-        
         res.json({
             success: true,
-            listings: listingsWithUrls,
+            listings: data || [],
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),
@@ -255,7 +173,7 @@ const getListings = async (req, res) => {
         });
     } catch (error) {
         console.error('Get listings error:', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération des annonces' });
+        res.status(500).json({ error: 'Erreur lors de la récupération' });
     }
 };
 
@@ -268,7 +186,7 @@ const getListingById = async (req, res) => {
             .from('listings')
             .select(`
                 *,
-                user:user_id (id, full_name, phone, badge_visible, is_cni_verified, created_at),
+                user:user_id (id, full_name, phone, badge_visible, is_cni_verified),
                 photos:listing_photos (storage_path, order_index, is_primary)
             `)
             .eq('id', id)
@@ -278,30 +196,22 @@ const getListingById = async (req, res) => {
             return res.status(404).json({ error: 'Annonce non trouvée' });
         }
         
-        console.log('📸 Listing brut photos:', listing.photos);
-        
         // Incrémenter les vues
         await supabase
             .from('listings')
             .update({ views_count: (listing.views_count || 0) + 1 })
             .eq('id', id);
         
-        // Générer les URLs signées pour les photos
-        const photosWithUrls = await Promise.all((listing.photos || []).map(async (p) => ({
-            ...p,
-            url: p.storage_path ? await getFileUrl(p.storage_path) : null
-        })));
-        
         res.json({
             success: true,
             listing: {
                 ...listing,
-                photos: photosWithUrls
+                photos: listing.photos || []
             }
         });
     } catch (error) {
         console.error('Get listing error:', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération de l\'annonce' });
+        res.status(500).json({ error: 'Erreur lors de la récupération' });
     }
 };
 
@@ -370,15 +280,6 @@ const deleteListing = async (req, res) => {
         
         if (existing.user_id !== userId && req.user.account_type !== 'professional') {
             return res.status(403).json({ error: 'Non autorisé' });
-        }
-        
-        const { data: photos } = await supabase
-            .from('listing_photos')
-            .select('storage_path')
-            .eq('listing_id', id);
-        
-        for (const photo of photos || []) {
-            await deleteFile(photo.storage_path);
         }
         
         await supabase.from('listing_photos').delete().eq('listing_id', id);
