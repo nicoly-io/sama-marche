@@ -9,6 +9,9 @@ const { logSecurityEvent } = require('../middleware/security');
 
 // Créer une annonce
 const createListing = async (req, res) => {
+    console.log('🔍 [DEBUG] createListing appelée');
+    console.log('🔍 [DEBUG] req.files avant upload:', req.files);
+    
     uploadListingPhotos(req, res, async (err) => {
         if (err) {
             console.error('❌ Upload error:', err);
@@ -207,21 +210,36 @@ const getListings = async (req, res) => {
         const from = (page - 1) * limit;
         const to = from + limit - 1;
         
-        const { data, error, count } = await query.range(from, to);
+        const { data, error, count } = await supabase
+            .from('listings')
+            .select('*', { count: 'exact' })
+            .eq('status', LISTING_STATUS.ACTIVE)
+            .range(from, to);
         
         if (error) throw error;
         
         // Générer les URLs signées pour chaque photo
         const listingsWithUrls = await Promise.all((data || []).map(async (listing) => {
-            const photosWithUrls = await Promise.all((listing.photos || []).map(async (p) => ({
+            const { data: photos } = await supabase
+                .from('listing_photos')
+                .select('storage_path, is_primary, order_index')
+                .eq('listing_id', listing.id);
+            
+            const photosWithUrls = await Promise.all((photos || []).map(async (p) => ({
                 ...p,
                 url: p.storage_path ? await getFileUrl(p.storage_path) : null
             })));
             
+            const { data: user } = await supabase
+                .from('users')
+                .select('id, full_name, badge_visible, is_cni_verified')
+                .eq('id', listing.user_id)
+                .single();
+            
             return {
                 ...listing,
                 photos: photosWithUrls,
-                user: listing.user
+                user: user
             };
         }));
         
